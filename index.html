@@ -1,0 +1,1960 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Physingo</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#39d353;--green-dk:#28a344;--green-glow:rgba(57,211,83,.25);
+  --blue:#38bdf8;--blue-dk:#0284c7;--blue-glow:rgba(56,189,248,.2);
+  --orange:#fb923c;--orange-glow:rgba(251,146,60,.2);
+  --red:#f87171;--gold:#fbbf24;--gold-glow:rgba(251,191,36,.25);
+  --purple:#c084fc;--purple-glow:rgba(192,132,252,.2);
+  --bg:#080e14;--surf:#0d1820;--surf2:#111f2c;--surf3:#162636;--surf4:#1c2f40;
+  --bdr:#1e3347;--bdr2:#243d52;--text:#e8f4ff;--muted:#5a7e96;--muted2:#7a9fb5;
+  --radius:18px;--radius-sm:12px;--radius-xs:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+
+body{
+  background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;
+  display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:relative;
+}
+
+/* Animated background grid */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(rgba(56,189,248,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(56,189,248,.03) 1px,transparent 1px);
+  background-size:32px 32px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%);
+}
+
+/* SCREENS */
+.scr{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  transition:opacity .28s cubic-bezier(.4,0,.2,1),transform .28s cubic-bezier(.4,0,.2,1);
+  opacity:0;pointer-events:none;transform:translateX(5%) scale(.98);z-index:1;
+}
+.scr.active{opacity:1;pointer-events:all;transform:none;}
+.scr.exit{opacity:0;transform:translateX(-5%) scale(.98);}
+
+/* TOP BAR */
+.tbar{
+  flex-shrink:0;display:flex;align-items:center;padding:13px 16px;gap:14px;
+  background:rgba(13,24,32,.9);border-bottom:1px solid var(--bdr);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:50;
+}
+.tbar-logo{
+  font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;
+  background:linear-gradient(135deg,var(--green),var(--blue));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  letter-spacing:-0.5px;flex:1;
+}
+.sp{
+  display:flex;align-items:center;gap:5px;font-weight:800;font-size:.82rem;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+  border-radius:99px;padding:4px 9px;
+}
+.sp-val{font-variant-numeric:tabular-nums;transition:transform .15s;}
+.sp-val.bump{animation:spbump .3s cubic-bezier(.34,1.56,.64,1);}
+@keyframes spbump{0%{transform:scale(1);}50%{transform:scale(1.35);}100%{transform:scale(1);}}
+
+/* Status pill */
+.stat-pill{
+  display:flex;align-items:center;gap:6px;
+  background:var(--surf2);border:1px solid var(--bdr2);border-radius:99px;
+  padding:5px 11px;font-size:.78rem;font-weight:800;
+}
+
+/* HOME */
+#s-home .body{flex:1;overflow-y:auto;padding:14px 14px 90px;scroll-behavior:smooth;}
+.sh{text-align:center;margin:12px 0 20px;}
+.sh-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,rgba(57,211,83,.1),rgba(56,189,248,.1));
+  border:1px solid rgba(57,211,83,.25);border-radius:99px;
+  padding:5px 14px;font-size:.65rem;font-weight:800;letter-spacing:2px;
+  text-transform:uppercase;color:var(--green);margin-bottom:8px;
+}
+.sh-title{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:var(--text);}
+.sh-subtitle{font-size:.75rem;color:var(--muted2);margin-top:4px;}
+
+/* XP bar on home */
+.home-xp{
+  background:var(--surf2);border:1px solid var(--bdr2);border-radius:var(--radius-sm);
+  padding:12px 14px;margin-bottom:16px;
+}
+.home-xp-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.home-xp-lbl{font-size:.72rem;font-weight:700;color:var(--muted2);}
+.home-xp-val{font-size:.72rem;font-weight:800;color:var(--gold);}
+.home-xp-bar{height:8px;background:var(--surf3);border-radius:99px;overflow:hidden;}
+.home-xp-fill{
+  height:100%;background:linear-gradient(90deg,var(--gold),#f59e0b);border-radius:99px;
+  transition:width .6s cubic-bezier(.34,1.56,.64,1);
+}
+
+/* PATH — SVG based */
+.path{
+  position:relative;width:100%;
+}
+.nwrap{
+  position:absolute;
+  display:flex;align-items:center;justify-content:center;
+}
+.vline{display:none;}
+
+/* NODE */
+.node{
+  width:76px;height:76px;border-radius:50%;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  font-size:2rem;position:relative;
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s;
+  -webkit-user-select:none;user-select:none;
+}
+/* Outer ring layer */
+.node::before{
+  content:'';position:absolute;inset:-5px;border-radius:50%;
+  background:conic-gradient(var(--node-clr,var(--green)) var(--node-prog,0%),rgba(255,255,255,.06) 0%);
+  z-index:-1;
+}
+/* Gap between ring and node */
+.node::after{
+  content:'';position:absolute;inset:-2px;border-radius:50%;
+  background:var(--bg);z-index:-1;
+}
+.node:active:not(.locked){transform:translateY(5px) scale(.93);}
+.node.locked{cursor:default;}
+.node.done .node-done-badge{display:flex;}
+
+.node-done-badge{
+  display:none;position:absolute;bottom:-2px;right:-2px;
+  width:20px;height:20px;border-radius:50%;
+  background:var(--green);border:2.5px solid var(--bg);
+  align-items:center;justify-content:center;font-size:.6rem;z-index:6;
+}
+
+/* Node title label — rendered OUTSIDE as a sibling div */
+.node-title{
+  position:absolute;left:50%;transform:translateX(-50%);
+  white-space:nowrap;
+  font-family:'Syne',sans-serif;font-size:.68rem;font-weight:800;
+  letter-spacing:.3px;text-transform:uppercase;
+  color:var(--text);opacity:.85;
+  background:rgba(8,14,20,.75);border:1px solid var(--bdr2);
+  border-radius:99px;padding:3px 9px;
+  backdrop-filter:blur(4px);
+  pointer-events:none;z-index:2;
+}
+.node-title.locked-lbl{color:var(--muted);opacity:.5;}
+
+/* POPUP CARD */
+.ncard{
+  display:none;position:absolute;top:96px;left:50%;transform:translateX(-50%);
+  background:var(--surf2);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:20px;
+  padding:18px 16px;width:230px;z-index:300;
+  box-shadow:0 20px 60px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.04),inset 0 1px 0 rgba(255,255,255,.05);
+  animation:popin .22s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes popin{from{opacity:0;transform:translateX(-50%) scale(.82) translateY(-8px);}to{opacity:1;transform:translateX(-50%) scale(1) translateY(0);}}
+.ncard.open{display:block;}
+.ncard-arrow{
+  position:absolute;top:-8px;left:50%;transform:translateX(-50%);
+  width:16px;height:8px;overflow:visible;
+}
+.ncard-arrow::before{
+  content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  border-left:8px solid transparent;border-right:8px solid transparent;
+  border-bottom:8px solid rgba(255,255,255,.08);
+}
+.ncard-arrow::after{
+  content:'';position:absolute;top:2px;left:50%;transform:translateX(-50%);
+  border-left:7px solid transparent;border-right:7px solid transparent;
+  border-bottom:7px solid var(--surf2);
+}
+.ncard-icon{font-size:2.2rem;margin-bottom:10px;display:block;text-align:center;}
+.ncard-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;margin-bottom:5px;text-align:center;}
+.ncard-sub{font-size:.71rem;color:var(--muted2);line-height:1.55;margin-bottom:10px;text-align:center;}
+.ncard-divider{height:1px;background:rgba(255,255,255,.06);margin:10px 0;}
+.ncard-meta{display:flex;gap:6px;justify-content:center;margin-bottom:14px;flex-wrap:wrap;}
+.ncard-chip{
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+  border-radius:99px;padding:3px 9px;font-size:.62rem;font-weight:700;color:var(--muted2);
+}
+.ncard-btn{
+  width:100%;border:none;border-radius:var(--radius-sm);padding:12px;
+  font-family:'Syne',sans-serif;font-size:.88rem;font-weight:800;
+  color:#fff;cursor:pointer;letter-spacing:.2px;
+  transition:transform .12s,box-shadow .12s;
+}
+.ncard-btn:active{transform:translateY(2px);}
+
+.ov{position:fixed;inset:0;z-index:200;display:none;}
+.ov.on{display:block;}
+
+/* QUIT MODAL */
+.modal-bg{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;
+  display:none;align-items:center;justify-content:center;padding:20px;
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+}
+.modal-bg.open{display:flex;}
+.modal{
+  background:var(--surf2);border:1px solid var(--bdr2);border-radius:24px;
+  padding:28px 22px;max-width:320px;width:100%;text-align:center;
+  animation:popin .28s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 24px 64px rgba(0,0,0,.7);
+}
+.modal-ico{font-size:2.8rem;margin-bottom:10px;}
+.modal-title{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;margin-bottom:6px;}
+.modal-sub{font-size:.82rem;color:var(--muted2);line-height:1.5;margin-bottom:22px;}
+.modal-btns{display:flex;flex-direction:column;gap:9px;}
+.mbtn{border:none;border-radius:var(--radius-sm);padding:14px;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:800;cursor:pointer;transition:transform .13s,box-shadow .13s;width:100%;}
+.mbtn:active{transform:scale(.97);}
+.mbtn.red{background:var(--red);color:#fff;box-shadow:0 4px 12px rgba(248,113,113,.3);}
+.mbtn.gh{background:var(--surf3);color:var(--text);border:1px solid var(--bdr2);}
+
+/* INTRO */
+#s-intro{justify-content:flex-end;}
+#s-intro .ib{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:28px;text-align:center;
+}
+.ii{font-size:5rem;animation:bouncein .5s cubic-bezier(.34,1.56,.64,1);filter:drop-shadow(0 0 20px rgba(255,255,255,.15));}
+@keyframes bouncein{from{opacity:0;transform:scale(.1) rotate(-10deg);}to{opacity:1;transform:scale(1) rotate(0);}}
+.it{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;margin:12px 0 6px;}
+.is{font-size:.85rem;color:var(--muted2);line-height:1.65;margin-bottom:20px;max-width:300px;}
+.chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:6px;}
+.chip{
+  background:var(--surf3);border:1px solid var(--bdr2);border-radius:99px;
+  padding:5px 13px;font-size:.7rem;font-weight:700;color:var(--muted2);
+}
+#s-intro .ifoot{padding:14px;display:flex;flex-direction:column;gap:10px;}
+
+/* LESSON */
+#s-lesson .lhd{
+  flex-shrink:0;display:flex;align-items:center;gap:12px;
+  padding:11px 14px;background:rgba(13,24,32,.9);border-bottom:1px solid var(--bdr);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+}
+.bx{
+  width:36px;height:36px;flex-shrink:0;border:1px solid var(--bdr2);background:var(--surf2);
+  color:var(--muted2);border-radius:var(--radius-xs);cursor:pointer;font-size:.95rem;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.bx:hover{border-color:var(--red);color:var(--red);}
+.bx:active{border-color:var(--red);color:var(--red);transform:scale(.93);}
+
+.pbar{flex:1;height:10px;background:var(--surf3);border-radius:99px;overflow:visible;position:relative;}
+.pfill{
+  height:100%;background:linear-gradient(90deg,var(--green),#7dff00);border-radius:99px;
+  transition:width .5s cubic-bezier(.34,1.56,.64,1);width:0%;
+  box-shadow:0 0 8px var(--green-glow);position:relative;
+}
+.pfill::after{
+  content:'';position:absolute;right:-1px;top:50%;transform:translateY(-50%);
+  width:14px;height:14px;border-radius:50%;
+  background:var(--green);box-shadow:0 0 8px var(--green-glow);
+  border:2px solid var(--bg);
+  opacity:var(--pfill-show,0);transition:opacity .3s;
+}
+
+.hts{display:flex;gap:3px;flex-shrink:0;}
+.ht{font-size:1rem;transition:all .3s cubic-bezier(.34,1.56,.64,1);}
+.ht.gone{opacity:.15;transform:scale(.5) rotate(-15deg);}
+
+.step-counter{
+  font-size:.68rem;font-weight:800;color:var(--muted);
+  font-variant-numeric:tabular-nums;flex-shrink:0;
+}
+
+.lbody{flex:1;overflow-y:auto;padding:16px 14px 110px;-webkit-overflow-scrolling:touch;}
+.step{max-width:520px;margin:0 auto;}
+.step.anim{animation:stepin .32s cubic-bezier(.34,1.56,.64,1);}
+@keyframes stepin{from{opacity:0;transform:translateY(22px) scale(.98);}to{opacity:1;transform:none;}}
+
+/* THEORY */
+.tcard{
+  background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--radius);
+  padding:18px;margin-bottom:12px;
+  box-shadow:0 4px 24px rgba(0,0,0,.3);
+}
+.thd{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.tico{
+  width:48px;height:48px;border-radius:14px;
+  background:linear-gradient(135deg,var(--surf2),var(--surf3));
+  border:1px solid var(--bdr2);
+  display:flex;align-items:center;justify-content:center;font-size:1.55rem;flex-shrink:0;
+}
+.tttl{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;}
+.tsub{font-size:.68rem;color:var(--muted2);margin-top:2px;}
+.tbd{font-size:.86rem;line-height:1.8;color:#b8d4e4;}
+.tbd p{margin-bottom:11px;}
+.tbd strong{color:var(--green);}
+
+.fbox{
+  background:linear-gradient(135deg,rgba(57,211,83,.05),rgba(56,189,248,.05));
+  border:1px solid rgba(57,211,83,.2);
+  border-radius:var(--radius-sm);padding:16px;margin:12px 0;text-align:center;
+  position:relative;overflow:hidden;
+}
+.fbox::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(57,211,83,.08),transparent 60%);
+  pointer-events:none;
+}
+.fmain{
+  font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:700;
+  background:linear-gradient(135deg,var(--green),var(--blue));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  letter-spacing:2px;
+}
+.fleg{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:10px;}
+.fi{
+  background:var(--surf2);border:1px solid var(--bdr2);border-radius:6px;
+  padding:3px 9px;font-size:.65rem;font-family:'JetBrains Mono',monospace;
+}
+.fi b{color:var(--blue);}
+
+.tip{
+  background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.2);border-radius:var(--radius-xs);
+  padding:12px 13px;margin:10px 0;display:flex;gap:10px;align-items:flex-start;
+}
+.tiico{font-size:1.2rem;flex-shrink:0;line-height:1.3;}
+.titxt{font-size:.8rem;line-height:1.65;color:#a4c8de;}
+.titxt strong{color:var(--blue);}
+
+.tabs{display:flex;gap:6px;margin:12px 0 0;flex-wrap:wrap;}
+.tab{
+  background:var(--surf3);border:1px solid var(--bdr2);border-radius:var(--radius-xs);
+  padding:5px 12px;font-size:.7rem;font-weight:700;cursor:pointer;transition:all .15s;color:var(--muted2);
+}
+.tab:hover{border-color:var(--blue);color:var(--blue);}
+.tab.on{border-color:var(--blue);color:var(--blue);background:rgba(56,189,248,.1);}
+.tabpan{
+  display:none;background:var(--surf2);border:1px solid var(--bdr2);border-radius:var(--radius-xs);
+  padding:12px;margin-top:6px;font-size:.8rem;line-height:1.65;color:#a4c8de;
+}
+.tabpan.on{display:block;animation:fadein .2s ease;}
+@keyframes fadein{from{opacity:0;}to{opacity:1;}}
+
+/* QUIZ */
+.qbadge{
+  font-size:.62rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;
+  color:var(--blue);margin-bottom:9px;display:flex;align-items:center;gap:6px;
+}
+.qbadge::before{content:'';display:inline-block;width:3px;height:12px;background:var(--blue);border-radius:2px;}
+.qtxt{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;line-height:1.45;margin-bottom:5px;}
+.qhint{
+  font-size:.76rem;color:var(--muted2);font-style:italic;margin-bottom:14px;
+  display:flex;align-items:center;gap:6px;
+}
+
+.opts{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+.opt{
+  display:flex;align-items:center;gap:12px;
+  background:var(--surf);border:1.5px solid var(--bdr2);
+  border-radius:var(--radius-sm);padding:13px 15px;cursor:pointer;
+  font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:700;
+  text-align:left;color:var(--text);width:100%;
+  transition:border-color .13s,background .13s,transform .1s;
+  position:relative;overflow:hidden;
+}
+.opt::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at var(--mx,50%) var(--my,50%),rgba(255,255,255,.04),transparent 60%);
+  opacity:0;transition:opacity .2s;pointer-events:none;
+}
+.opt:hover::before{opacity:1;}
+.opt:active:not(:disabled){transform:scale(.98);}
+.oltr{
+  width:28px;height:28px;border-radius:8px;background:var(--surf2);border:1.5px solid var(--bdr2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.72rem;font-weight:900;flex-shrink:0;transition:all .15s;
+  font-family:'JetBrains Mono',monospace;color:var(--muted2);
+}
+.opt.sel{border-color:var(--blue)!important;background:rgba(56,189,248,.07)!important;}
+.opt.sel .oltr{border-color:var(--blue)!important;color:var(--blue)!important;background:rgba(56,189,248,.15)!important;}
+.opt.ok{
+  border-color:var(--green)!important;background:rgba(57,211,83,.08)!important;
+  animation:popok .35s cubic-bezier(.34,1.56,.64,1);
+}
+.opt.ok .oltr{border-color:var(--green)!important;background:var(--green)!important;color:#051a09!important;}
+.opt.bad{border-color:var(--red)!important;background:rgba(248,113,113,.07)!important;animation:shake .38s ease;}
+.opt.bad .oltr{border-color:var(--red)!important;background:var(--red)!important;color:#fff!important;}
+@keyframes popok{0%{transform:scale(1);}40%{transform:scale(1.03);}100%{transform:scale(1);}}
+@keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-8px);}40%{transform:translateX(8px);}60%{transform:translateX(-6px);}80%{transform:translateX(6px);}}
+
+/* KEYBOARD SHORTCUT HINTS */
+.kbhints{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.kbh{background:var(--surf3);border:1px solid var(--bdr2);border-radius:5px;padding:2px 7px;font-size:.6rem;font-family:'JetBrains Mono',monospace;color:var(--muted);font-weight:700;}
+
+/* FILL */
+.finp{
+  width:100%;background:var(--surf2);border:1.5px solid var(--blue);border-radius:var(--radius-sm);
+  color:var(--text);font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;
+  padding:14px 16px;outline:none;margin:12px 0;
+  transition:border-color .15s,box-shadow .15s;
+}
+.finp:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(56,189,248,.15),0 0 12px rgba(56,189,248,.08);}
+.finp.ok{border-color:var(--green);color:var(--green);box-shadow:0 0 0 3px rgba(57,211,83,.12);}
+.finp.bad{border-color:var(--red);color:var(--red);animation:shake .38s ease;}
+
+/* PAIRS */
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.pbtn{
+  background:var(--surf);border:1.5px solid var(--bdr2);border-radius:var(--radius-sm);
+  padding:11px 8px;cursor:pointer;font-size:.76rem;font-weight:700;text-align:center;
+  font-family:'JetBrains Mono',monospace;transition:all .15s;min-height:50px;
+  display:flex;align-items:center;justify-content:center;color:var(--text);width:100%;line-height:1.3;
+}
+.pbtn:active:not(.done){transform:scale(.95);}
+.pbtn.sel{border-color:var(--orange)!important;background:rgba(251,146,60,.1)!important;color:var(--orange)!important;box-shadow:0 0 12px var(--orange-glow);}
+.pbtn.done{border-color:var(--green)!important;background:rgba(57,211,83,.1)!important;color:var(--green)!important;cursor:default;animation:popok .3s cubic-bezier(.34,1.56,.64,1);}
+.pbtn.err{animation:shake .38s ease;border-color:var(--red)!important;background:rgba(248,113,113,.07)!important;}
+
+/* WORD */
+.slots{
+  display:flex;flex-wrap:wrap;gap:7px;min-height:50px;
+  border:1.5px dashed var(--bdr2);border-radius:var(--radius-sm);
+  padding:10px;margin:10px 0;align-items:center;
+  background:rgba(255,255,255,.01);transition:border-color .2s,background .2s;
+}
+.slots.has-items{border-color:var(--orange);background:rgba(251,146,60,.03);}
+.sph{color:var(--muted);font-size:.76rem;}
+.bank{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px;}
+.wc{
+  background:var(--surf2);border:1.5px solid var(--bdr2);border-radius:var(--radius-xs);
+  padding:7px 12px;cursor:pointer;font-family:'JetBrains Mono',monospace;
+  font-size:.8rem;font-weight:700;transition:all .15s;color:var(--text);
+}
+.wc:active:not(.used){transform:scale(.9);}
+.wc.used{opacity:.18;pointer-events:none;}
+.wc.placed{border-color:var(--orange);background:rgba(251,146,60,.1);color:var(--orange);}
+.wc:not(.used):not(.placed):hover{border-color:var(--blue);color:var(--blue);}
+
+/* FEEDBACK */
+.fb{border-radius:var(--radius-sm);padding:14px 15px;margin:10px 0;border:1.5px solid;display:none;}
+.fb.ok{background:rgba(57,211,83,.06);border-color:rgba(57,211,83,.3);}
+.fb.bad{background:rgba(248,113,113,.06);border-color:rgba(248,113,113,.3);}
+.fb-ttl{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:800;margin-bottom:5px;}
+.fb.ok .fb-ttl{color:var(--green);}
+.fb.bad .fb-ttl{color:var(--red);}
+.fb-bd{font-size:.79rem;color:var(--muted2);line-height:1.6;}
+.fb-bd code{font-family:'JetBrains Mono',monospace;color:var(--blue);font-size:.9em;}
+
+/* CTA BAR */
+.ctabar{
+  position:absolute;bottom:0;left:0;right:0;padding:12px 14px;
+  padding-bottom:calc(12px + env(safe-area-inset-bottom));
+  background:rgba(8,14,20,.92);border-top:1px solid var(--bdr);z-index:100;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+}
+.cta{
+  width:100%;border:none;border-radius:var(--radius-sm);padding:17px;
+  font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;
+  cursor:pointer;transition:transform .13s,box-shadow .13s,background .2s;
+  letter-spacing:.3px;
+}
+.cta:active:not([disabled]){transform:translateY(3px);}
+.cta.idle{background:var(--surf3);color:var(--muted);border:1px solid var(--bdr2);}
+.cta.rdy{
+  background:linear-gradient(135deg,var(--green),#2dd545);color:#051a09;
+  box-shadow:0 6px 20px var(--green-glow),0 3px 0 var(--green-dk);
+}
+.cta.rdy:active{box-shadow:0 2px 8px var(--green-glow),0 1px 0 var(--green-dk);}
+.cta.cont{
+  background:linear-gradient(135deg,var(--blue),#0ea5e9);color:#fff;
+  box-shadow:0 6px 20px var(--blue-glow),0 3px 0 var(--blue-dk);
+}
+.cta.cont:active{box-shadow:0 2px 8px var(--blue-glow),0 1px 0 var(--blue-dk);}
+.cta.theory{
+  background:linear-gradient(135deg,var(--blue),#0ea5e9);color:#fff;
+  box-shadow:0 6px 20px var(--blue-glow),0 3px 0 var(--blue-dk);
+}
+
+/* RESULT */
+#s-result{overflow-y:auto;align-items:center;padding:30px 18px 50px;}
+.res-glow{
+  width:120px;height:120px;border-radius:50%;margin:0 auto 4px;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 50% 50%,rgba(57,211,83,.12),transparent 70%);
+  animation:glowin 2s ease-in-out infinite alternate;
+}
+@keyframes glowin{from{box-shadow:0 0 20px rgba(57,211,83,.1);}to{box-shadow:0 0 50px rgba(57,211,83,.25);}}
+.owl{font-size:5rem;animation:bouncein .55s cubic-bezier(.34,1.56,.64,1);}
+.rtitle{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;margin:12px 0 6px;text-align:center;}
+.rsub{font-size:.84rem;color:var(--muted2);text-align:center;margin-bottom:24px;line-height:1.55;max-width:280px;}
+
+.rtiles{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;width:100%;max-width:340px;margin-bottom:20px;}
+.rtile{
+  background:var(--surf2);border:1px solid var(--bdr2);border-radius:var(--radius-sm);
+  padding:16px 6px;text-align:center;
+  box-shadow:0 4px 16px rgba(0,0,0,.25);
+}
+.rval{font-family:'Syne',sans-serif;font-size:1.55rem;font-weight:800;}
+.rlbl{font-size:.62rem;color:var(--muted2);font-weight:700;margin-top:3px;letter-spacing:.5px;text-transform:uppercase;}
+
+.xpsec{width:100%;max-width:340px;margin-bottom:24px;}
+.xphd{display:flex;justify-content:space-between;font-size:.72rem;font-weight:700;color:var(--muted2);margin-bottom:7px;}
+.xpbar{height:14px;background:var(--surf2);border-radius:99px;overflow:hidden;border:1px solid var(--bdr2);}
+.xpfill{height:100%;background:linear-gradient(90deg,var(--gold),#f59e0b);border-radius:99px;width:0;transition:width 1.2s cubic-bezier(.34,1.56,.64,1);box-shadow:0 0 10px var(--gold-glow);}
+
+.rbtns{width:100%;max-width:340px;display:flex;flex-direction:column;gap:9px;}
+.rbtn{
+  border:none;border-radius:var(--radius-sm);padding:16px;
+  font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;
+  cursor:pointer;transition:transform .13s,box-shadow .13s;width:100%;letter-spacing:.2px;
+}
+.rbtn:active{transform:scale(.97);}
+.rbtn.g{background:linear-gradient(135deg,var(--green),#2dd545);color:#051a09;box-shadow:0 6px 20px var(--green-glow),0 3px 0 var(--green-dk);}
+.rbtn.gh{background:var(--surf2);color:var(--text);border:1px solid var(--bdr2);}
+
+/* BUTTONS */
+.btn{
+  border:none;border-radius:var(--radius-sm);padding:16px;
+  font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;cursor:pointer;
+  transition:transform .13s,box-shadow .13s;width:100%;
+  display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.2px;
+}
+.btn:active{transform:scale(.97);}
+.btn.g{background:linear-gradient(135deg,var(--green),#2dd545);color:#051a09;box-shadow:0 6px 20px var(--green-glow),0 3px 0 var(--green-dk);}
+.btn.g:active{box-shadow:0 2px 8px var(--green-glow),0 1px 0 var(--green-dk);}
+.btn.gh{background:var(--surf2);color:var(--text);border:1px solid var(--bdr2);}
+
+/* FX */
+.particle{position:fixed;pointer-events:none;font-size:1.5rem;animation:pfly 1.2s ease-out forwards;z-index:9999;}
+@keyframes pfly{0%{opacity:1;transform:translateY(0) scale(1) rotate(0deg);}100%{opacity:0;transform:translateY(-130px) scale(.2) rotate(30deg);}}
+.xppop{
+  position:fixed;pointer-events:none;font-weight:900;font-size:1.1rem;
+  color:var(--gold);text-shadow:0 0 12px var(--gold-glow);
+  animation:xpfly .9s ease-out forwards;z-index:9999;font-family:'Syne',sans-serif;
+}
+@keyframes xpfly{0%{opacity:1;transform:translateY(0) translateX(-50%) scale(.8);}60%{opacity:1;transform:translateY(-50px) translateX(-50%) scale(1.1);}100%{opacity:0;transform:translateY(-90px) translateX(-50%) scale(.9);}}
+
+.toast{
+  position:fixed;top:14px;left:50%;transform:translateX(-50%);
+  background:linear-gradient(135deg,var(--orange),#ef6820);color:#fff;border-radius:99px;
+  padding:9px 20px;font-weight:800;font-size:.82rem;z-index:9999;white-space:nowrap;
+  animation:tin .3s cubic-bezier(.34,1.56,.64,1) forwards, tout .3s ease 2.2s forwards;
+  box-shadow:0 8px 24px rgba(251,146,60,.35);font-family:'Syne',sans-serif;
+}
+@keyframes tin{from{opacity:0;transform:translateX(-50%) translateY(-16px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+@keyframes tout{to{opacity:0;transform:translateX(-50%) translateY(-10px);}}
+
+/* SOUND TOGGLE */
+.sound-btn{
+  width:32px;height:32px;border:1px solid var(--bdr2);background:var(--surf2);
+  border-radius:8px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:.85rem;transition:all .15s;flex-shrink:0;
+}
+.sound-btn:active{transform:scale(.9);}
+.sound-btn.muted{opacity:.5;}
+
+/* STREAK BADGE */
+.streak-badge{
+  display:inline-flex;align-items:center;gap:4px;padding:4px 10px;
+  background:linear-gradient(135deg,rgba(251,146,60,.15),rgba(251,146,60,.05));
+  border:1px solid rgba(251,146,60,.3);border-radius:99px;
+  font-size:.78rem;font-weight:800;color:var(--orange);
+}
+.streak-fire{animation:fireflick 0.8s ease-in-out infinite alternate;}
+@keyframes fireflick{from{transform:scale(1) rotate(-3deg);}to{transform:scale(1.15) rotate(3deg);}}
+
+/* LEVEL BADGE */
+.lvl-badge{
+  background:var(--surf3);border:1px solid var(--bdr2);border-radius:99px;
+  padding:3px 10px;font-size:.68rem;font-weight:800;color:var(--gold);
+  display:inline-flex;align-items:center;gap:4px;
+}
+
+/* HINT TOGGLE */
+.hint-btn{
+  display:inline-flex;align-items:center;gap:5px;background:none;border:1px solid var(--bdr2);
+  border-radius:99px;padding:5px 12px;font-size:.72rem;font-weight:700;color:var(--muted2);
+  cursor:pointer;transition:all .15s;font-family:'Nunito',sans-serif;margin-bottom:6px;
+}
+.hint-btn:hover{border-color:var(--gold);color:var(--gold);}
+
+/* DIFFICULTY COLORS */
+.diff-green{color:#39d353;}
+.diff-blue{color:#38bdf8;}
+.diff-orange{color:#fb923c;}
+.diff-purple{color:#c084fc;}
+
+/* QUICK LESSON BUTTON */
+.quick-btn{
+  display:flex;align-items:center;gap:12px;
+  background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(251,146,60,.08));
+  border:1.5px solid rgba(251,191,36,.35);border-radius:var(--radius);
+  padding:14px 16px;margin-bottom:14px;cursor:pointer;
+  transition:transform .15s,box-shadow .15s;position:relative;overflow:hidden;
+  width:100%;text-align:left;font-family:'Nunito',sans-serif;color:var(--text);
+}
+.quick-btn::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 0% 50%,rgba(251,191,36,.08),transparent 60%);
+  pointer-events:none;
+}
+.quick-btn:active{transform:scale(.98);}
+.quick-btn-ico{
+  font-size:2rem;flex-shrink:0;
+  filter:drop-shadow(0 0 8px rgba(251,191,36,.6));
+  animation:quickpulse 2s ease-in-out infinite;
+}
+@keyframes quickpulse{0%,100%{transform:scale(1);}50%{transform:scale(1.1);}}
+.quick-btn-info{flex:1;}
+.quick-btn-title{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;color:var(--gold);}
+.quick-btn-sub{font-size:.72rem;color:var(--muted2);margin-top:2px;}
+.quick-btn-badge{
+  background:linear-gradient(135deg,var(--orange),var(--gold));
+  color:#1a0a00;border-radius:99px;padding:3px 10px;
+  font-size:.65rem;font-weight:900;flex-shrink:0;letter-spacing:.5px;
+}
+
+/* DAILY STREAK */
+.daily-streak{
+  display:flex;align-items:center;gap:10px;
+  background:var(--surf2);border:1px solid var(--bdr2);border-radius:var(--radius-sm);
+  padding:11px 14px;margin-bottom:12px;
+}
+.ds-fires{display:flex;gap:4px;flex:1;}
+.ds-day{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  font-size:.58rem;font-weight:800;color:var(--muted);text-transform:uppercase;
+}
+.ds-fire{
+  font-size:1.05rem;filter:grayscale(1);opacity:.3;
+  transition:all .3s cubic-bezier(.34,1.56,.64,1);
+}
+.ds-fire.lit{filter:none;opacity:1;animation:fireflick .8s ease-in-out infinite alternate;}
+.ds-lbl{font-family:'Syne',sans-serif;font-size:.88rem;font-weight:800;color:var(--gold);}
+
+/* QUICK PICKER SCREEN */
+#s-quick .qp-body{flex:1;overflow-y:auto;padding:16px 14px 80px;}
+.qp-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;margin-bottom:4px;}
+.qp-sub{font-size:.78rem;color:var(--muted2);margin-bottom:16px;line-height:1.5;}
+.qp-grid{display:flex;flex-direction:column;gap:9px;}
+.qp-card{
+  display:flex;align-items:center;gap:12px;
+  background:var(--surf);border:1.5px solid var(--bdr2);border-radius:var(--radius-sm);
+  padding:13px 14px;cursor:pointer;transition:all .15s;
+  font-family:'Nunito',sans-serif;color:var(--text);width:100%;text-align:left;
+  position:relative;overflow:hidden;
+}
+.qp-card::after{
+  content:'';position:absolute;inset:0;opacity:0;transition:opacity .15s;
+  background:linear-gradient(135deg,rgba(255,255,255,.03),transparent);
+  pointer-events:none;
+}
+.qp-card:hover::after{opacity:1;}
+.qp-card:active{transform:scale(.98);}
+.qp-card.locked-card{opacity:.4;cursor:not-allowed;}
+.qp-icon{font-size:1.7rem;flex-shrink:0;}
+.qp-info{flex:1;}
+.qp-name{font-family:'Syne',sans-serif;font-size:.88rem;font-weight:800;margin-bottom:2px;}
+.qp-desc{font-size:.7rem;color:var(--muted2);}
+.qp-arrow{color:var(--muted);font-size:.9rem;flex-shrink:0;}
+.qp-lvl{font-size:.62rem;font-weight:800;border-radius:99px;padding:2px 8px;border:1px solid;flex-shrink:0;}
+
+/* TIMER IN LESSON */
+.timer-wrap{
+  display:flex;align-items:center;gap:7px;flex-shrink:0;
+  background:var(--surf3);border:1px solid var(--bdr2);border-radius:99px;
+  padding:4px 10px;
+  transition:background .3s,border-color .3s;
+}
+.timer-wrap.urgent{background:rgba(248,113,113,.15);border-color:rgba(248,113,113,.4);animation:urgentpulse 1s ease-in-out infinite;}
+@keyframes urgentpulse{0%,100%{box-shadow:0 0 0 0 rgba(248,113,113,.0);}50%{box-shadow:0 0 0 4px rgba(248,113,113,.2);}}
+.timer-ico{font-size:.85rem;}
+.timer-val{
+  font-family:'JetBrains Mono',monospace;font-size:.82rem;font-weight:700;
+  color:var(--text);font-variant-numeric:tabular-nums;min-width:2.5ch;
+  transition:color .3s;
+}
+.timer-val.urgent{color:var(--red);}
+
+/* TIMER BAR (replaces progress bar in quick mode) */
+.tbar-quick{
+  flex:1;height:10px;background:var(--surf3);border-radius:99px;overflow:hidden;position:relative;
+}
+.tbar-quick-fill{
+  height:100%;background:linear-gradient(90deg,var(--gold),var(--orange));border-radius:99px;
+  transition:width .9s linear;width:100%;
+  box-shadow:0 0 8px rgba(251,191,36,.4);
+}
+.tbar-quick-fill.urgent{background:linear-gradient(90deg,var(--red),#f87171);box-shadow:0 0 8px rgba(248,113,113,.4);}
+
+/* QUICK RESULT */
+.quick-result-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:linear-gradient(135deg,rgba(251,191,36,.15),rgba(251,146,60,.1));
+  border:1.5px solid rgba(251,191,36,.4);border-radius:99px;
+  padding:8px 18px;margin-bottom:16px;
+  font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;color:var(--gold);
+}
+.flame-earned{font-size:1.6rem;animation:fireflick .6s ease-in-out infinite alternate;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:99px;}
+</style>
+</head>
+<body>
+
+<div class="ov" id="ov" onclick="closeCards()"></div>
+
+<!-- QUIT MODAL -->
+<div class="modal-bg" id="quit-modal">
+  <div class="modal">
+    <div class="modal-ico">🚪</div>
+    <div class="modal-title">Quitter la leçon ?</div>
+    <div class="modal-sub">Ta progression dans cette leçon sera perdue. Tu peux la recommencer quand tu veux !</div>
+    <div class="modal-btns">
+      <button class="mbtn red" onclick="confirmQuit()">Quitter quand même</button>
+      <button class="mbtn gh" onclick="cancelQuit()">Continuer la leçon</button>
+    </div>
+  </div>
+</div>
+
+<!-- HOME -->
+<div class="scr active" id="s-home">
+  <div class="tbar">
+    <div class="tbar-logo">Physingo ⚗️</div>
+    <div class="sp"><span class="streak-fire">🔥</span><span class="sp-val" id="h-str">0</span></div>
+    <div class="sp"><span style="color:var(--gold)">⭐</span><span class="sp-val" id="h-xp">0</span></div>
+    <div class="sp"><span>❤️</span><span class="sp-val" id="h-lv">5</span></div>
+    <button class="sound-btn" id="sound-btn" onclick="toggleSound()" title="Son">🔊</button>
+  </div>
+  <div class="body" id="home-body">
+    <div class="sh">
+      <div class="sh-tag">✦ Parcours</div>
+      <div class="sh-title">Ta carte d'apprentissage</div>
+      <div class="sh-subtitle">Débloque les leçons en gagnant de l'XP 🗺️</div>
+    </div>
+    <div class="home-xp" id="home-xp-sec">
+      <div class="home-xp-hd">
+        <span class="home-xp-lbl">Niveau <span id="home-lvl">1</span></span>
+        <span class="home-xp-val"><span id="home-xpin">0</span> / 200 XP</span>
+      </div>
+      <div class="home-xp-bar"><div class="home-xp-fill" id="home-xpfill" style="width:0%"></div></div>
+    </div>
+    <!-- Daily Streak -->
+    <div class="daily-streak">
+      <div class="ds-fires" id="ds-fires"></div>
+      <div class="ds-lbl" id="ds-lbl">0 🔥</div>
+    </div>
+    <!-- Quick Lesson Button -->
+    <button class="quick-btn" onclick="openQuickPicker()">
+      <span class="quick-btn-ico">⚡</span>
+      <div class="quick-btn-info">
+        <div class="quick-btn-title">Leçon Rapide</div>
+        <div class="quick-btn-sub">2 minutes · compte pour la flamme 🔥</div>
+      </div>
+      <span class="quick-btn-badge">2 MIN</span>
+    </button>
+    <div class="path" id="path"></div>
+  </div>
+</div>
+
+<!-- INTRO -->
+<div class="scr" id="s-intro">
+  <div class="tbar">
+    <button class="bx" onclick="goHome()">←</button>
+    <div style="flex:1;font-size:.85rem;font-weight:700;color:var(--muted2)">Aperçu de la leçon</div>
+  </div>
+  <div class="ib">
+    <div id="ii-ico" class="ii"></div>
+    <div id="ii-title" class="it"></div>
+    <div id="ii-sub" class="is"></div>
+    <div class="chips">
+      <div class="chip" id="ii-steps">— étapes</div>
+      <div class="chip" id="ii-lvl">—</div>
+    </div>
+  </div>
+  <div style="padding:14px;display:flex;flex-direction:column;gap:10px;">
+    <button class="btn g" onclick="startLesson()">Commencer la leçon 🚀</button>
+    <button class="btn gh" onclick="goHome()">← Retour à la carte</button>
+  </div>
+</div>
+
+<!-- QUICK PICKER -->
+<div class="scr" id="s-quick">
+  <div class="tbar">
+    <button class="bx" onclick="goHome()">←</button>
+    <div style="flex:1;font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;color:var(--gold)">⚡ Leçon Rapide</div>
+    <span class="quick-btn-badge">2 MIN</span>
+  </div>
+  <div class="qp-body">
+    <div class="qp-title">Choisis un thème</div>
+    <div class="qp-sub">Tu as <strong style="color:var(--gold)">2 minutes</strong> pour finir un mini-quiz. Si tu réussis, la flamme du jour est maintenue 🔥</div>
+    <div class="qp-grid" id="qp-grid"></div>
+  </div>
+</div>
+
+<!-- LESSON -->
+<div class="scr" id="s-lesson">
+  <div class="lhd">
+    <button class="bx" onclick="quitLesson()">✕</button>
+    <!-- normal progress -->
+    <div class="pbar" id="pbar-normal"><div class="pfill" id="pfill"></div></div>
+    <!-- quick timer bar -->
+    <div class="tbar-quick" id="tbar-quick" style="display:none"><div class="tbar-quick-fill" id="tqfill"></div></div>
+    <div class="hts" id="hts"></div>
+    <div class="step-counter" id="step-ctr">1/1</div>
+    <!-- quick timer display -->
+    <div class="timer-wrap" id="timer-wrap" style="display:none">
+      <span class="timer-ico">⏱</span>
+      <span class="timer-val" id="timer-val">2:00</span>
+    </div>
+  </div>
+  <div class="lbody" id="lbody">
+    <div class="step" id="step"></div>
+  </div>
+  <div class="ctabar">
+    <button class="cta idle" id="cta" onclick="handleCTA()">Vérifier</button>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="scr" id="s-result">
+  <div id="quick-result-banner" style="display:none;margin-top:16px;">
+    <div class="quick-result-badge"><span class="flame-earned">🔥</span> Flamme du jour maintenue !</div>
+  </div>
+  <div class="res-glow">
+    <div id="r-owl" class="owl"></div>
+  </div>
+  <div id="r-title" class="rtitle"></div>
+  <div id="r-sub" class="rsub"></div>
+  <div class="rtiles">
+    <div class="rtile">
+      <div class="rval" id="r-cor" style="color:var(--green)"></div>
+      <div class="rlbl">Correctes</div>
+    </div>
+    <div class="rtile">
+      <div class="rval" id="r-xp" style="color:var(--gold)"></div>
+      <div class="rlbl">XP gagné</div>
+    </div>
+    <div class="rtile">
+      <div class="rval" id="r-acc" style="color:var(--blue)"></div>
+      <div class="rlbl">Précision</div>
+    </div>
+  </div>
+  <div class="xpsec">
+    <div class="xphd">
+      <span>Niveau <span id="r-lvl">1</span></span>
+      <span id="r-xplbl"></span>
+    </div>
+    <div class="xpbar"><div class="xpfill" id="r-xpfill"></div></div>
+  </div>
+  <div class="rbtns">
+    <button class="rbtn g" onclick="replayLesson()">🔄 Rejouer la leçon</button>
+    <button class="rbtn gh" onclick="goHome()">🗺️ Retour à la carte</button>
+  </div>
+</div>
+
+<script>
+/* ==========================================================
+   CURRICULUM DATA
+========================================================== */
+const CUR = [
+  {id:'ch0',icon:'📏',color:'#39d353',nodeColor:'#39d353',title:'Mesures & Incertitudes',sub:'Grandeurs, unités SI et incertitudes de mesure.',level:'🟢 1re',steps:[
+    {k:'theory',ico:'📐',title:'Grandeurs et unités SI',sub:'Les bases de la mesure',
+      html:`<p>Une <strong>grandeur physique</strong> est une propriété exprimée par un nombre et une unité.</p>
+      <div class="fbox"><div class="fmain">Valeur = Nombre × Unité</div></div>
+      <p>Unités dérivées SI importantes :</p>
+      <div class="tip"><div class="tiico">📋</div><div class="titxt"><b>Hz</b> = s⁻¹ · <b>N</b> = kg·m·s⁻² · <b>J</b> = kg·m²·s⁻² · <b>W</b> = J/s · <b>Pa</b> = kg·m⁻¹·s⁻²</div></div>`},
+    {k:'theory',ico:'🎯',title:'Précision et incertitude',sub:'Fidélité, justesse et calcul',
+      html:`<p>Deux types d'erreurs :</p>
+      <div class="tip"><div class="tiico">🎯</div><div class="titxt"><strong>Erreur aléatoire</strong> (manipulateur) → diminuer cette erreur augmente la <strong>fidélité</strong>.<br><strong>Erreur systématique</strong> (instrument) → diminuer cette erreur augmente la <strong>justesse</strong>.</div></div>
+      <div class="fbox"><div class="fmain">M = m̄ ± u(m)</div><div class="fleg"><div class="fi"><b>m̄</b> moyenne</div><div class="fi"><b>u(m)</b> incertitude-type</div></div></div>`},
+    {k:'mcq',q:'Quelle erreur est due à l\'instrument de mesure ?',
+      opts:['Erreur aléatoire','Erreur systématique','Erreur de répétabilité','Erreur humaine'],ans:1,
+      expl:'L\'erreur <strong>systématique</strong> vient de l\'instrument. La réduire augmente la <strong>justesse</strong>. L\'erreur aléatoire vient du manipulateur et affecte la fidélité.'},
+    {k:'mcq',q:'L\'unité du Newton (N) en unités de base est :',
+      opts:['kg·m·s⁻¹','kg·m·s⁻²','kg·m²·s⁻²','kg·m⁻¹·s⁻²'],ans:1,
+      expl:'N = kg·m·s⁻² car F = m×a. Le joule vaut kg·m²·s⁻².'},
+    {k:'pairs',q:'Associe chaque grandeur à son unité SI :',
+      pairs:[['Énergie','Joule (J)'],['Puissance','Watt (W)'],['Pression','Pascal (Pa)'],['Fréquence','Hertz (Hz)']],
+      expl:'J = kg·m²·s⁻², W = J/s, Pa = N/m², Hz = s⁻¹. Ces unités sont dérivées des 7 unités de base du SI.'},
+  ]},
+  {id:'ch1',icon:'⚡',color:'#fbbf24',nodeColor:'#fbbf24',title:'L\'Énergie & ses Enjeux',sub:'Formes d\'énergie, sources renouvelables et rendement.',level:'🟢 1re',steps:[
+    {k:'theory',ico:'🔋',title:'Formes et sources d\'énergie',sub:'6 formes, renouvelable vs non-renouvelable',
+      html:`<p>6 grandes formes d'énergie :</p>
+      <div class="tip"><div class="tiico">⚡</div><div class="titxt"><strong>Chimique</strong> (pétrole, aliments) · <strong>Mécanique</strong> (mouvement, altitude) · <strong>Thermique</strong> (chaleur) · <strong>Nucléaire</strong> (fission) · <strong>Rayonnante</strong> (IR, UV) · <strong>Électrique</strong> (charges)</div></div>
+      <p><strong>Non renouvelables :</strong> fossiles (charbon, gaz, pétrole) + uranium.<br><strong>Renouvelables :</strong> solaire, hydraulique, éolienne, géothermique, biomasse.</p>`},
+    {k:'theory',ico:'♻️',title:'Conversions et rendement',sub:'Chaînes énergétiques',
+      html:`<p>Un convertisseur transforme une forme d'énergie en une autre, toujours avec des pertes.</p>
+      <div class="fbox"><div class="fmain">η = E_utile / E_totale</div><div class="fleg"><div class="fi"><b>η</b> rendement (0 à 1)</div></div></div>
+      <p>L'énergie se <strong>conserve</strong> toujours : E_totale = E_utile + E_perdue.</p>`},
+    {k:'mcq',q:'Quelle est la première source d\'énergie renouvelable française ?',
+      opts:['Solaire','Éolienne','Hydraulique','Géothermique'],ans:2,
+      expl:'L\'énergie <strong>hydraulique</strong> (barrages) est la 1re source renouvelable en France selon EDF.'},
+    {k:'fill',q:'Un panneau solaire reçoit 1000 J et produit 180 J. Son rendement η = ___ %.',ph:'ex: 18',
+      ans:'18',acc:['18'],hint:'η = E_utile / E_totale × 100',
+      expl:'η = 180 / 1000 × 100 = <code>18%</code>. Les panneaux photovoltaïques ont un rendement de 15 à 22%.'},
+    {k:'mcq',q:'L\'énergie mécanique comprend :',
+      opts:['Énergie chimique + thermique','Énergie cinétique + potentielle','Énergie nucléaire + rayonnante','Énergie électrique + chimique'],ans:1,
+      expl:'L\'énergie mécanique = <strong>énergie cinétique</strong> (mouvement) + <strong>énergie potentielle</strong> (position/altitude).'},
+  ]},
+  {id:'ch2',icon:'🔥',color:'#f87171',nodeColor:'#f87171',title:'Énergie Chimique',sub:'Triangle du feu, exothermique/endothermique, pouvoir calorifique.',level:'🟢 1re',steps:[
+    {k:'theory',ico:'🔺',title:'Triangle du feu et combustion',sub:'Les 3 éléments indispensables',
+      html:`<p>Une <strong>combustion</strong> nécessite 3 éléments : combustible + comburant (O₂) + énergie d'activation.</p>
+      <div class="tip"><div class="tiico">🔺</div><div class="titxt">Triangle du feu : <strong>Combustible</strong> (bois, essence…) + <strong>Comburant</strong> (O₂) + <strong>Énergie d'activation</strong>. Supprimer un côté éteint le feu !</div></div>
+      <p><strong>Combustion complète</strong> → CO₂ + H₂O<br><strong>Combustion incomplète</strong> (O₂ insuffisant) → CO, suies, H₂O</p>`},
+    {k:'theory',ico:'🌡️',title:'Exothermique vs Endothermique',sub:'Échanges d\'énergie thermique',
+      html:`<p>Réaction <strong>exothermique</strong> → libère de la chaleur (ex: combustion).<br>Réaction <strong>endothermique</strong> → absorbe de la chaleur (ex: fusion).</p>
+      <div class="fbox"><div class="fmain">E = PC × masse</div><div class="fleg"><div class="fi"><b>PC</b> pouvoir calorifique (J/kg)</div></div></div>`},
+    {k:'mcq',q:'Quels sont les seuls produits d\'une combustion COMPLÈTE d\'un hydrocarbure ?',
+      opts:['CO + H₂O','CO₂ + H₂O','C + CO₂','CO₂ + CO'],ans:1,
+      expl:'Combustion complète → <strong>CO₂</strong> + <strong>H₂O</strong>. La combustion incomplète produit aussi du CO et des suies.'},
+    {k:'mcq',q:'La fusion (glace → eau) est une réaction :',
+      opts:['Exothermique','Endothermique','Neutre','Explosive'],ans:1,
+      expl:'La fusion <strong>absorbe</strong> de l\'énergie → elle est <strong>endothermique</strong>. La solidification libère de l\'énergie → exothermique.'},
+    {k:'fill',q:'PC = 50 000 J/kg. Brûler 2 kg libère ___ J.',ph:'ex: 100000',
+      ans:'100000',acc:['100000','100 000'],hint:'E = PC × masse = 50000 × 2',
+      expl:'E = 50 000 × 2 = <code>100 000 J</code>.'},
+  ]},
+  {id:'ch3',icon:'🔌',color:'#38bdf8',nodeColor:'#38bdf8',title:'Tension & Intensité',sub:'Loi d\'Ohm, lois des nœuds et des mailles.',level:'🟢 1re',steps:[
+    {k:'theory',ico:'⚡',title:'Courant, tension et loi d\'Ohm',sub:'Les bases de l\'électricité',
+      html:`<p>Le <strong>courant électrique</strong> = déplacement d'électrons. Il s'exprime en <strong>Ampère (A)</strong>.</p>
+      <p>La <strong>tension</strong> U (en Volt) = différence de potentiel. Nécessaire pour faire circuler un courant.</p>
+      <div class="fbox"><div class="fmain">U = R × I</div><div class="fleg"><div class="fi"><b>U</b> tension (V)</div><div class="fi"><b>R</b> résistance (Ω)</div><div class="fi"><b>I</b> intensité (A)</div></div></div>`},
+    {k:'theory',ico:'🔗',title:'Lois des circuits',sub:'Nœuds et mailles',
+      html:`<p><strong>Loi des nœuds :</strong> ΣI_entrants = ΣI_sortants</p>
+      <p><strong>Loi des mailles :</strong> La somme algébrique des tensions dans une maille = 0.</p>
+      <div class="tip"><div class="tiico">🔗</div><div class="titxt">En <strong>série</strong> : même I, tensions s'additionnent.<br>En <strong>parallèle</strong> : même U, intensités s'additionnent.</div></div>`},
+    {k:'mcq',q:'R = 50 Ω, U = 10 V. L\'intensité I vaut :',
+      opts:['500 A','5 A','0,2 A','0,02 A'],ans:2,
+      expl:'I = U/R = 10/50 = <code>0,2 A</code>. On isole I dans U = R×I.'},
+    {k:'fill',q:'Deux résistances en série : R1 = 30 Ω, R2 = 20 Ω. R_total = ___ Ω.',ph:'ex: 50',
+      ans:'50',acc:['50'],hint:'En série : R_total = R1 + R2',
+      expl:'En série : R_total = 30 + 20 = <code>50 Ω</code>.'},
+    {k:'mcq',q:'Dans un nœud, 3 A et 2 A entrent. Combien sort-il ?',
+      opts:['1 A','2 A','5 A','6 A'],ans:2,
+      expl:'Loi des nœuds : 3 + 2 = <code>5 A</code> sortent.'},
+  ]},
+  {id:'ch4',icon:'💡',color:'#38bdf8',nodeColor:'#38bdf8',title:'Puissance Électrique',sub:'P = UI, énergie électrique et effet Joule.',level:'🟢 1re',steps:[
+    {k:'theory',ico:'⚡',title:'Puissance et énergie électrique',sub:'P = UI et E = Pt',
+      html:`<div class="fbox"><div class="fmain">P = U × I</div><div class="fleg"><div class="fi"><b>P</b> puissance (W)</div><div class="fi"><b>U</b> tension (V)</div><div class="fi"><b>I</b> intensité (A)</div></div></div>
+      <div class="fbox"><div class="fmain">E = P × t</div><div class="fleg"><div class="fi"><b>E</b> énergie (J)</div><div class="fi"><b>t</b> durée (s)</div></div></div>
+      <div class="tip"><div class="tiico">💡</div><div class="titxt">1 kWh = 3 600 000 J = 3,6 MJ. C'est l'unité des factures d'électricité.</div></div>`},
+    {k:'theory',ico:'🌡️',title:'Effet Joule et transport',sub:'Pertes thermiques',
+      html:`<p>Un conducteur ohmique transforme l'énergie électrique en chaleur : c'est l'<strong>effet Joule</strong>.</p>
+      <div class="fbox"><div class="fmain">P_Joule = R × I²</div></div>
+      <div class="tip"><div class="tiico">⚠️</div><div class="titxt">Le transport à <strong>haute tension</strong> réduit I, donc les pertes Joule R×I². Les lignes THT fonctionnent à 400 kV.</div></div>`},
+    {k:'mcq',q:'U = 230 V, I = 2 A. La puissance P vaut :',
+      opts:['115 W','232 W','460 W','4600 W'],ans:2,
+      expl:'P = U × I = 230 × 2 = <code>460 W</code>.'},
+    {k:'fill',q:'Un radiateur de 1000 W fonctionne 3600 s. L\'énergie = ___ J.',ph:'ex: 3600000',
+      ans:'3600000',acc:['3600000','3 600 000'],hint:'E = P × t = 1000 × 3600',
+      expl:'E = 1000 × 3600 = <code>3 600 000 J</code> = 1 kWh.'},
+    {k:'mcq',q:'Pour réduire les pertes Joule lors du transport, on :',
+      opts:['Augmente l\'intensité','Augmente la tension','Diminue la tension','Augmente la résistance'],ans:1,
+      expl:'P_Joule = R×I². Si on <strong>augmente la tension</strong>, l\'intensité diminue et les pertes chutent.'},
+  ]},
+  {id:'ch5',icon:'🌡️',color:'#fb923c',nodeColor:'#fb923c',title:'Énergie Interne & Chaleur',sub:'Q = mcΔθ et les 3 modes de transfert thermique.',level:'🟢 1re',steps:[
+    {k:'theory',ico:'♨️',title:'Les 3 transferts thermiques',sub:'Conduction, convection, rayonnement',
+      html:`<div class="tip"><div class="tiico">🧱</div><div class="titxt"><strong>Conduction</strong> : de proche en proche, sans déplacement de matière. Seul mode dans les solides.</div></div>
+      <div class="tip"><div class="tiico">🌊</div><div class="titxt"><strong>Convection</strong> : mouvement de matière dans les gaz et liquides.</div></div>
+      <div class="tip"><div class="tiico">☀️</div><div class="titxt"><strong>Rayonnement</strong> : onde EM, se propage même dans le vide.</div></div>`},
+    {k:'theory',ico:'📐',title:'Q = m × c × Δθ',sub:'La formule de la chaleur',
+      html:`<div class="fbox"><div class="fmain">Q = m × c × Δθ</div><div class="fleg"><div class="fi"><b>Q</b> chaleur (J)</div><div class="fi"><b>m</b> masse (kg)</div><div class="fi"><b>c</b> capacité thermique massique (J·kg⁻¹·°C⁻¹)</div><div class="fi"><b>Δθ</b> variation de T (°C)</div></div></div>
+      <div class="tip"><div class="tiico">💧</div><div class="titxt">Pour l'eau : c = 4 180 J·kg⁻¹·°C⁻¹. L'eau est difficile à chauffer → idéale comme fluide caloporteur.</div></div>`},
+    {k:'mcq',q:'Quel mode de transfert thermique peut se faire dans le vide ?',
+      opts:['Conduction','Convection','Rayonnement','Aucun'],ans:2,
+      expl:'Le <strong>rayonnement</strong> est une onde EM qui se propage dans le vide. C\'est ainsi que la chaleur du Soleil nous parvient.'},
+    {k:'fill',q:'2 kg d\'eau (c = 4180 J/kg/°C) chauffée de 20 à 70°C. Q = ___ J.',ph:'ex: 418000',
+      ans:'418000',acc:['418000','418 000'],hint:'Q = m × c × Δθ = 2 × 4180 × 50',
+      expl:'Q = 2 × 4180 × 50 = <code>418 000 J</code>.'},
+    {k:'mcq',q:'Le seul mode de transfert thermique dans un solide est :',
+      opts:['Convection','Rayonnement','Conduction','Les trois'],ans:2,
+      expl:'Dans un <strong>solide</strong>, les particules ne se déplacent pas → seule la <strong>conduction</strong> est possible.'},
+  ]},
+  {id:'ch6',icon:'❄️',color:'#fb923c',nodeColor:'#fb923c',title:'Bilan Énergétique',sub:'Changements d\'état, chaleur latente Q = mL.',level:'🟢 1re',steps:[
+    {k:'theory',ico:'🧊',title:'Changements d\'état',sub:'La température reste constante',
+      html:`<p>Pendant un changement d'état d'un corps pur, la <strong>température reste constante</strong>. Seule l'énergie potentielle microscopique varie.</p>
+      <div class="tip"><div class="tiico">🌡️</div><div class="titxt">Fusion, vaporisation → <strong>endothermiques</strong> (absorbent de l'énergie).<br>Solidification, condensation → <strong>exothermiques</strong> (libèrent de l'énergie).</div></div>`},
+    {k:'theory',ico:'📊',title:'Chaleur latente Q = mL',sub:'Énergie de changement d\'état',
+      html:`<div class="fbox"><div class="fmain">Q = m × L</div><div class="fleg"><div class="fi"><b>L</b> chaleur latente massique (J/kg)</div></div></div>
+      <div class="tip"><div class="tiico">💧</div><div class="titxt">Eau : L_fusion = 334 000 J/kg · L_vaporisation = 2 260 000 J/kg. Il faut beaucoup plus d'énergie pour vaporiser que pour fondre !</div></div>`},
+    {k:'mcq',q:'Lors de la fusion d\'un corps pur, la température :',
+      opts:['Augmente','Diminue','Reste constante','Varie selon la masse'],ans:2,
+      expl:'Pendant tout le changement d\'état, la <strong>température reste constante</strong>. L\'énergie reçue sert à rompre les liaisons moléculaires.'},
+    {k:'pairs',q:'Associe chaque changement d\'état à son sens thermique :',
+      pairs:[['Fusion','Endothermique'],['Solidification','Exothermique'],['Vaporisation','Endothermique'],['Condensation','Exothermique']],
+      expl:'Passage vers un état moins ordonné (solide→liquide→gaz) = endothermique. Sens inverse = exothermique.'},
+    {k:'fill',q:'Fondre 0,5 kg de glace (L = 334 000 J/kg). Q = ___ J.',ph:'ex: 167000',
+      ans:'167000',acc:['167000','167 000'],hint:'Q = m × L = 0,5 × 334000',
+      expl:'Q = 0,5 × 334 000 = <code>167 000 J</code>.'},
+  ]},
+  {id:'ch7',icon:'🚀',color:'#39d353',nodeColor:'#39d353',title:'Mouvement & Vitesse',sub:'Référentiels, vecteur vitesse, accélération et 1re loi de Newton.',level:'🟢 1re',steps:[
+    {k:'theory',ico:'📍',title:'Référentiels et vitesse',sub:'Décrire le mouvement',
+      html:`<p>Un <strong>référentiel</strong> = solide de référence + horloge.</p>
+      <div class="tip"><div class="tiico">🌍</div><div class="titxt"><strong>Terrestre</strong> → mouvements à la surface.<br><strong>Géocentrique</strong> → satellites, Lune.<br><strong>Héliocentrique</strong> → planètes.</div></div>
+      <div class="fbox"><div class="fmain">v_moy = d / Δt</div><div class="fleg"><div class="fi"><b>v</b> m/s · <b>d</b> m · <b>Δt</b> s</div></div></div>`},
+    {k:'theory',ico:'⚖️',title:'1re loi de Newton',sub:'Principe d\'inertie',
+      html:`<div class="tip"><div class="tiico">⚖️</div><div class="titxt">Si les forces se <strong>compensent</strong> (ou sont nulles), l'objet reste <strong>immobile</strong> ou en <strong>mouvement rectiligne uniforme</strong>.</div></div>
+      <div class="fbox"><div class="fmain">Σ F⃗ = 0 ⟺ v = constante</div></div>`},
+    {k:'mcq',q:'Une voiture roule à 90 km/h sans accélérer. Les forces sont :',
+      opts:['Toutes nulles','Qui se compensent','Uniquement la gravité','Aucune force'],ans:1,
+      expl:'Mouvement rectiligne uniforme → les forces se <strong>compensent</strong> (1re loi de Newton). Le moteur compense les frottements.'},
+    {k:'fill',q:'Un cycliste parcourt 360 m en 30 s. Sa vitesse = ___ m/s.',ph:'ex: 12',
+      ans:'12',acc:['12'],hint:'v = d / Δt = 360 / 30',
+      expl:'v = 360 / 30 = <code>12 m/s</code> ≈ 43 km/h.'},
+    {k:'mcq',q:'Le référentiel héliocentrique est centré sur :',
+      opts:['La Terre','La Lune','Le Soleil','Une étoile lointaine'],ans:2,
+      expl:'Héliocentrique (Helios = Soleil) → centré sur le Soleil. Utilisé pour décrire les mouvements des planètes.'},
+  ]},
+  {id:'ch8',icon:'🏋️',color:'#39d353',nodeColor:'#39d353',title:'Énergie Mécanique',sub:'Ec = ½mv², Epp = mgz, Em = Ec + Ep.',level:'🟢 1re',steps:[
+    {k:'theory',ico:'🏃',title:'Énergie cinétique',sub:'L\'énergie du mouvement',
+      html:`<div class="fbox"><div class="fmain">Ec = ½ × m × v²</div><div class="fleg"><div class="fi"><b>Ec</b> énergie cinétique (J)</div><div class="fi"><b>m</b> masse (kg)</div><div class="fi"><b>v</b> vitesse (m/s)</div></div></div>
+      <div class="tip"><div class="tiico">🚗</div><div class="titxt">ΔEc = ΣW (somme des travaux des forces). Si ΣW > 0 → vitesse augmente.</div></div>`},
+    {k:'theory',ico:'⛰️',title:'Énergie potentielle et mécanique',sub:'Epp = mgz et Em = Ec + Ep',
+      html:`<div class="fbox"><div class="fmain">Epp = m × g × z</div><div class="fleg"><div class="fi"><b>g</b> ≈ 9,8 m/s²</div><div class="fi"><b>z</b> altitude (m)</div></div></div>
+      <div class="fbox"><div class="fmain">Em = Ec + Ep</div><div class="fleg"><div class="fi">conservée sans frottements</div></div></div>`},
+    {k:'fill',q:'m = 2 kg, v = 10 m/s. Ec = ___ J.',ph:'ex: 100',
+      ans:'100',acc:['100'],hint:'Ec = ½ × 2 × 10²',
+      expl:'Ec = ½ × 2 × 100 = <code>100 J</code>.'},
+    {k:'fill',q:'m = 5 kg, g = 9,8 m/s², z = 10 m. Epp = ___ J.',ph:'ex: 490',
+      ans:'490',acc:['490'],hint:'Epp = m × g × z = 5 × 9,8 × 10',
+      expl:'Epp = 5 × 9,8 × 10 = <code>490 J</code>.'},
+    {k:'mcq',q:'Sans frottements, l\'énergie mécanique d\'un objet :',
+      opts:['Augmente','Diminue','Reste constante','Devient nulle'],ans:2,
+      expl:'Sans frottements, <strong>Em est conservée</strong> : Ec et Ep se convertissent mutuellement, leur somme reste constante.'},
+  ]},
+  {id:'ch9',icon:'☀️',color:'#fbbf24',nodeColor:'#fbbf24',title:'Énergie Lumineuse',sub:'Irradiance, panneaux photovoltaïques et lasers.',level:'🔵 Terminale',steps:[
+    {k:'theory',ico:'🌞',title:'Irradiance et flux énergétique',sub:'Puissance surfacique',
+      html:`<div class="fbox"><div class="fmain">I = ϕ_E / S</div><div class="fleg"><div class="fi"><b>I</b> irradiance (W/m²)</div><div class="fi"><b>ϕ_E</b> flux énergétique (W)</div><div class="fi"><b>S</b> surface (m²)</div></div></div>
+      <div class="tip"><div class="tiico">☀️</div><div class="titxt">Irradiance solaire au sol ≈ <strong>1000 W/m²</strong> par temps ensoleillé. Se mesure avec un pyranomètre.</div></div>`},
+    {k:'theory',ico:'🔋',title:'Panneaux photovoltaïques et lasers',sub:'Applications',
+      html:`<p>Un <strong>panneau photovoltaïque</strong> convertit l'énergie solaire en électricité. Rendement en 2025 : <strong>15 à 22%</strong>.</p>
+      <p>Un <strong>laser</strong> (Light Amplification by Stimulated Emission of Radiation) : lumière <strong>monochromatique</strong>, <strong>directive</strong> et <strong>concentrée</strong>.</p>
+      <p>Applications : industrie (découpe), médecine (chirurgie oculaire), télémétrie.</p>`},
+    {k:'fill',q:'I = 800 W/m², S = 2 m². Flux ϕ = ___ W.',ph:'ex: 1600',
+      ans:'1600',acc:['1600'],hint:'ϕ = I × S = 800 × 2',
+      expl:'ϕ = 800 × 2 = <code>1600 W</code>.'},
+    {k:'mcq',q:'Le rendement d\'un panneau solaire en 2025 est environ de :',
+      opts:['1-5%','15-22%','50-60%','80-90%'],ans:1,
+      expl:'Un panneau photovoltaïque moderne a un rendement de <strong>15 à 22%</strong>. Le reste est perdu sous forme thermique.'},
+    {k:'mcq',q:'Quelle propriété distingue la lumière LASER ?',
+      opts:['Elle est invisible','Elle est monochromatique et directive','Elle va plus vite','Elle ne chauffe pas'],ans:1,
+      expl:'Le laser est <strong>monochromatique</strong> (une seule λ) et <strong>directif</strong>. La lumière blanche est polychromatique et divergente.'},
+  ]},
+  {id:'ch10',icon:'🧲',color:'#c084fc',nodeColor:'#c084fc',title:'Matériaux & Chimie',sub:'Familles de matériaux, groupes caractéristiques et concentration.',level:'🔵 Terminale',steps:[
+    {k:'theory',ico:'🏗️',title:'Familles de matériaux',sub:'Métalliques, minéraux et organiques',
+      html:`<p>3 familles principales :</p>
+      <div class="tip"><div class="tiico">⚙️</div><div class="titxt"><strong>Métalliques</strong> : fer, aluminium, cuivre — conducteurs.</div></div>
+      <div class="tip"><div class="tiico">🪨</div><div class="titxt"><strong>Minéraux</strong> : roches, céramiques, verre — obtenus par cuisson.</div></div>
+      <div class="tip"><div class="tiico">🌿</div><div class="titxt"><strong>Organiques</strong> : plastiques, bois, caoutchouc — base carbone.</div></div>
+      <p>Les <strong>composites</strong> combinent plusieurs familles (ex : fibre de carbone).</p>`},
+    {k:'theory',ico:'🧮',title:'Concentration d\'une solution',sub:'Cm et C = n/V',
+      html:`<div class="fbox"><div class="fmain">Cm = m / V</div><div class="fleg"><div class="fi"><b>Cm</b> concentration massique (g/L)</div></div></div>
+      <div class="fbox"><div class="fmain">C = n / V</div><div class="fleg"><div class="fi"><b>C</b> concentration molaire (mol/L)</div></div></div>
+      <div class="tip"><div class="tiico">🔗</div><div class="titxt">Lien : <strong>C = Cm / M</strong> (M = masse molaire en g/mol).</div></div>`},
+    {k:'mcq',q:'Quel matériau est organique ?',
+      opts:['Acier','Verre','Plastique','Béton'],ans:2,
+      expl:'Le <strong>plastique</strong> est organique (base carbone, synthétique). L\'acier est métallique, le verre et le béton sont minéraux.'},
+    {k:'fill',q:'n = 0,5 mol dans V = 0,25 L. Concentration C = ___ mol/L.',ph:'ex: 2',
+      ans:'2',acc:['2','2.0'],hint:'C = n / V = 0,5 / 0,25',
+      expl:'C = 0,5 / 0,25 = <code>2 mol/L</code>.'},
+    {k:'mcq',q:'La formule semi-développée ne représente pas :',
+      opts:['Les liaisons C-C','Les liaisons C=C','Les liaisons C-H','Les doublets non-liants'],ans:2,
+      expl:'La formule <strong>semi-développée</strong> simplifie en ne montrant pas les liaisons <strong>C-H</strong> (ni les doublets non-liants, contrairement au schéma de Lewis).'},
+  ]},
+  {id:'ch11',icon:'🧪',color:'#c084fc',nodeColor:'#c084fc',title:'Combustions & Alcanes',sub:'Hydrocarbures, alcools et réactif limitant.',level:'🔵 Terminale',steps:[
+    {k:'theory',ico:'⚗️',title:'Hydrocarbures : alcanes et alcènes',sub:'Formules générales',
+      html:`<div class="fbox"><div class="fmain">Alcanes : CₙH₂ₙ₊₂</div><div class="fleg"><div class="fi">liaisons simples uniquement</div><div class="fi">ex: méthane CH₄, propane C₃H₈</div></div></div>
+      <div class="fbox"><div class="fmain">Alcènes : CₙH₂ₙ</div><div class="fleg"><div class="fi">au moins une liaison double C=C</div></div></div>
+      <div class="tip"><div class="tiico">🔥</div><div class="titxt">Combustion <strong>complète</strong> : CO₂ + H₂O · Combustion <strong>incomplète</strong> : CO + suies + H₂O</div></div>`},
+    {k:'theory',ico:'🧫',title:'Réactif limitant',sub:'Tableau d\'avancement',
+      html:`<p>Le <strong>réactif limitant</strong> est le premier à s'épuiser. Pour le trouver, on compare les ratios <strong>n / coefficient stœchiométrique</strong>.</p>
+      <div class="tip"><div class="tiico">📊</div><div class="titxt">C₃H₈ + 5 O₂ → 3 CO₂ + 4 H₂O<br>n(C₃H₈)=0,2 → 0,2/1=0,2 · n(O₂)=0,8 → 0,8/5=0,16<br>→ O₂ est le réactif limitant (0,16 < 0,2)</div></div>`},
+    {k:'mcq',q:'La formule générale des alcanes est :',
+      opts:['CₙH₂ₙ','CₙH₂ₙ₊₂','CₙH₂ₙ₋₂','CₙHₙ'],ans:1,
+      expl:'Alcanes : <strong>CₙH₂ₙ₊₂</strong> (liaisons simples). Alcènes : CₙH₂ₙ (une liaison double C=C).'},
+    {k:'mcq',q:'Pour trouver le réactif limitant, on compare :',
+      opts:['Les masses','Les volumes','n / coefficient stœchiométrique','Les densités'],ans:2,
+      expl:'On divise n de chaque réactif par son <strong>coefficient stœchiométrique</strong>. Le plus petit ratio → réactif limitant.'},
+    {k:'fill',q:'C₃H₈ + 5 O₂ → produits. Pour 2 mol de C₃H₈, il faut ___ mol de O₂.',ph:'ex: 10',
+      ans:'10',acc:['10'],hint:'Coefficient de O₂ = 5, donc 2 × 5',
+      expl:'2 mol C₃H₈ × 5 = <code>10 mol O₂</code>.'},
+  ]},
+  {id:'ch12',icon:'🔋',color:'#c084fc',nodeColor:'#c084fc',title:'Oxydoréduction & Piles',sub:'Couples redox, demi-équations et piles électrochimiques.',level:'🔵 Terminale',steps:[
+    {k:'theory',ico:'⚡',title:'Oxydant, réducteur et couples redox',sub:'Échange d\'électrons',
+      html:`<div class="tip"><div class="tiico">➕</div><div class="titxt"><strong>Oxydant</strong> : gagne des e⁻ → subit une <strong>réduction</strong> (ex: Cu²⁺)<br><strong>Réducteur</strong> : perd des e⁻ → subit une <strong>oxydation</strong> (ex: Fe)</div></div>
+      <div class="fbox"><div class="fmain">Ox + n e⁻ → Red</div><div class="fleg"><div class="fi">demi-équation de réduction</div></div></div>
+      <p>Exemple : Cu²⁺<sub>(aq)</sub> + Fe<sub>(s)</sub> → Cu<sub>(s)</sub> + Fe²⁺<sub>(aq)</sub></p>`},
+    {k:'theory',ico:'🔋',title:'La pile électrochimique',sub:'Énergie chimique → énergie électrique',
+      html:`<div class="tip"><div class="tiico">⚡</div><div class="titxt">Borne <strong>−</strong> (anode) : oxydation → Zn → Zn²⁺ + 2e⁻<br>Borne <strong>+</strong> (cathode) : réduction → Cu²⁺ + 2e⁻ → Cu</div></div>
+      <p>Les <strong>électrons</strong> circulent dans le circuit extérieur. Les <strong>ions</strong> circulent dans l'électrolyte/pont salin.</p>`},
+    {k:'mcq',q:'Un oxydant est une espèce qui :',
+      opts:['Perd des électrons','Gagne des électrons','Produit des protons','Absorbe des neutrons'],ans:1,
+      expl:'Un <strong>oxydant gagne des électrons</strong> → il est réduit. Moyen mémo : OIL RIG (Oxidation Is Loss, Reduction Is Gain).'},
+    {k:'pairs',q:'Associe chaque électrode à son processus :',
+      pairs:[['Anode','Oxydation'],['Cathode','Réduction'],['Borne −','Anode'],['Borne +','Cathode']],
+      expl:'Anode = oxydation = borne −. Cathode = réduction = borne +. Dans une pile Daniell : Zn s\'oxyde, Cu²⁺ se réduit.'},
+    {k:'mcq',q:'Dans une pile, les électrons circulent :',
+      opts:['Dans l\'électrolyte','Dans le pont salin','Dans le circuit extérieur','Ils ne bougent pas'],ans:2,
+      expl:'Les <strong>électrons</strong> circulent dans les fils du <strong>circuit extérieur</strong>. Les ions circulent dans l\'électrolyte.'},
+  ]},
+  {id:'ch13',icon:'🌊',color:'#38bdf8',nodeColor:'#38bdf8',title:'Notion d\'Onde',sub:'λ = c/f, ondes mécaniques et électromagnétiques.',level:'🔵 Terminale',steps:[
+    {k:'theory',ico:'🌊',title:'Définition et types d\'ondes',sub:'Transfert d\'énergie sans transport de matière',
+      html:`<p>Une <strong>onde</strong> = propagation d'une perturbation. Transfert d'énergie <strong>sans transport de matière</strong>.</p>
+      <div class="tip"><div class="tiico">🔊</div><div class="titxt"><strong>Mécaniques</strong> : besoin d'un milieu (son, vagues, séismes). Longitudinales ou transversales.</div></div>
+      <div class="tip"><div class="tiico">💡</div><div class="titxt"><strong>Électromagnétiques</strong> : se propagent dans le vide (lumière, micro-ondes, UV).</div></div>`},
+    {k:'theory',ico:'📐',title:'Période, fréquence et longueur d\'onde',sub:'Les caractéristiques d\'une onde',
+      html:`<div class="fbox"><div class="fmain">f = 1 / T</div></div>
+      <div class="fbox"><div class="fmain">λ = c / f</div><div class="fleg"><div class="fi"><b>c</b> célérité (m/s)</div><div class="fi"><b>λ</b> longueur d'onde (m)</div><div class="fi"><b>f</b> fréquence (Hz)</div></div></div>
+      <div class="tip"><div class="tiico">📡</div><div class="titxt">La <strong>modulation</strong> d'une onde (AM/FM) permet de transmettre de l'information.</div></div>`},
+    {k:'mcq',q:'Une onde est définie comme :',
+      opts:['Un transport de matière','Un transfert d\'énergie sans transport de matière','Un mouvement de particules','Un flux de photons'],ans:1,
+      expl:'Une onde = <strong>transfert d\'énergie SANS transport de matière</strong>. Une bouée monte et descend mais ne se déplace pas vers le rivage.'},
+    {k:'fill',q:'c = 340 m/s, f = 440 Hz. Longueur d\'onde λ = ___ m.',ph:'ex: 0.77',
+      ans:'0.77',acc:['0.77','0,77','0.773'],hint:'λ = c / f = 340 / 440',
+      expl:'λ = 340 / 440 ≈ <code>0,77 m</code>. C\'est la longueur d\'onde du La 440 Hz dans l\'air.'},
+    {k:'mcq',q:'Quelle onde peut se propager dans le vide ?',
+      opts:['Le son','Les ondes sismiques','La lumière','Les vagues'],ans:2,
+      expl:'La <strong>lumière</strong> est une onde EM qui se propage dans le vide. Le son est mécanique → impossible dans le vide.'},
+  ]},
+  {id:'ch14',icon:'🔊',color:'#38bdf8',nodeColor:'#38bdf8',title:'Ondes Sonores',sub:'Célérité du son, fréquence et intensité acoustique.',level:'🔵 Terminale',steps:[
+    {k:'theory',ico:'🎵',title:'Célérité et fréquence du son',sub:'Aigu, grave, ultrasons',
+      html:`<p>Onde sonore = onde mécanique longitudinale produite par vibration.</p>
+      <div class="tip"><div class="tiico">👂</div><div class="titxt">Sons audibles : <strong>20 Hz à 20 000 Hz</strong>.<br>Infrasons : f < 20 Hz · Ultrasons : f > 20 000 Hz.</div></div>
+      <p>Célérité dans l'air à 20°C ≈ <strong>340 m/s</strong>. Dépend du milieu et de la température.</p>`},
+    {k:'theory',ico:'📊',title:'Intensité acoustique',sub:'I = Pa / S',
+      html:`<div class="fbox"><div class="fmain">I = Pa / S</div><div class="fleg"><div class="fi"><b>I</b> intensité acoustique (W/m²)</div><div class="fi"><b>Pa</b> puissance acoustique (W)</div></div></div>
+      <div class="tip"><div class="tiico">⚠️</div><div class="titxt">Seuil d'audition : 10⁻¹² W/m² · Seuil de douleur : 25 W/m². Au-delà de 85 dB prolongé → risque de surdité.</div></div>`},
+    {k:'mcq',q:'La fréquence des sons audibles est entre :',
+      opts:['0 et 100 Hz','20 Hz et 20 000 Hz','100 Hz et 100 000 Hz','1 Hz et 1000 Hz'],ans:1,
+      expl:'L\'oreille humaine perçoit entre <strong>20 Hz</strong> (graves) et <strong>20 000 Hz</strong> (aigus).'},
+    {k:'fill',q:'c = 340 m/s, f = 1700 Hz. λ = ___ m.',ph:'ex: 0.2',
+      ans:'0.2',acc:['0.2','0,2'],hint:'λ = c / f = 340 / 1700',
+      expl:'λ = 340 / 1700 = <code>0,2 m</code>.'},
+    {k:'mcq',q:'Un son aigu a une fréquence :',
+      opts:['Faible','Élevée','Nulle','Identique à un son grave'],ans:1,
+      expl:'Son aigu = fréquence <strong>élevée</strong>. Son grave = fréquence faible.'},
+  ]},
+  {id:'ch15',icon:'🌈',color:'#c084fc',nodeColor:'#c084fc',title:'Ondes EM',sub:'Spectre EM, lumière et photométrie.',level:'🔵 Terminale',steps:[
+    {k:'theory',ico:'💡',title:'Onde électromagnétique et spectre',sub:'c = 3 × 10⁸ m/s',
+      html:`<div class="fbox"><div class="fmain">c = 3 × 10⁸ m/s</div><div class="fleg"><div class="fi">vitesse dans le vide</div></div></div>
+      <p>Spectre EM (λ décroissante, f et énergie croissantes) :</p>
+      <div class="tip"><div class="tiico">🌈</div><div class="titxt">Ondes radio → Micro-ondes → Infrarouge → Visible → UV → Rayons X → Rayons γ</div></div>`},
+    {k:'theory',ico:'🔦',title:'Sources lumineuses et photométrie',sub:'Température de couleur, flux et éclairement',
+      html:`<p>La couleur d'une source dépend de sa <strong>température de couleur</strong> (en Kelvin).</p>
+      <div class="tip"><div class="tiico">🌡️</div><div class="titxt">2700 K → lumière chaude (orangée) · 6500 K → lumière froide (bleutée).</div></div>
+      <p><strong>Flux lumineux</strong> Φ (lumen, lm) = puissance lumineuse perçue par l'œil.<br><strong>Éclairement</strong> E (lux, lx) = Φ / S</p>`},
+    {k:'mcq',q:'La vitesse des ondes EM dans le vide est :',
+      opts:['340 m/s','3 × 10⁶ m/s','3 × 10⁸ m/s','3 × 10¹⁰ m/s'],ans:2,
+      expl:'c = <strong>3 × 10⁸ m/s</strong> ≈ 300 000 km/s. C\'est la vitesse maximale de l\'univers.'},
+    {k:'mcq',q:'Dans le spectre EM, quelle radiation a la plus grande longueur d\'onde ?',
+      opts:['Rayons X','UV','Infrarouge','Ondes radio'],ans:3,
+      expl:'Les <strong>ondes radio</strong> ont la plus grande longueur d\'onde. Les rayons γ ont la plus petite.'},
+    {k:'pairs',q:'Associe chaque onde à une application :',
+      pairs:[['Micro-ondes','Four à micro-ondes'],['Rayons X','Radiographie médicale'],['UV','Stérilisation'],['IR','Télécommande']],
+      expl:'Chaque gamme du spectre a ses applications selon son énergie et sa capacité de pénétration.'},
+  ]},
+];
+
+/* ==========================================================
+   STATE + PERSISTENCE
+========================================================== */
+const XPL = 200;
+const QUICK_DURATION = 120; // 2 minutes in seconds
+let G = {
+  xp:0,streak:0,lives:5,level:1,li:0,si:0,answered:false,
+  correct:0,wrong:0,cur:null,ps:null,ws:null,cstate:'idle',
+  soundOn:true,completed:[],
+  // daily streak
+  dailyStreak:0,lastPlayDate:'',todayDone:false,
+  // quick mode
+  isQuick:false,quickSteps:[],quickTimeLeft:QUICK_DURATION,quickTimer:null,quickDone:false
+};
+
+function todayKey(){return new Date().toISOString().slice(0,10);}
+
+function saveState(){
+  try{localStorage.setItem('physingo',JSON.stringify({
+    xp:G.xp,streak:G.streak,level:G.level,completed:G.completed,soundOn:G.soundOn,
+    dailyStreak:G.dailyStreak,lastPlayDate:G.lastPlayDate,todayDone:G.todayDone
+  }));}catch(e){}
+}
+function loadState(){
+  try{
+    const d=JSON.parse(localStorage.getItem('physingo')||'{}');
+    if(d.xp!=null)G.xp=d.xp;
+    if(d.streak!=null)G.streak=d.streak;
+    if(d.level!=null)G.level=d.level;
+    if(d.completed)G.completed=d.completed;
+    if(d.soundOn!=null)G.soundOn=d.soundOn;
+    if(d.dailyStreak!=null)G.dailyStreak=d.dailyStreak;
+    if(d.lastPlayDate)G.lastPlayDate=d.lastPlayDate;
+    if(d.todayDone!=null)G.todayDone=d.todayDone;
+    // reset todayDone if a new day
+    const today=todayKey();
+    if(G.lastPlayDate && G.lastPlayDate !== today){
+      // check if streak is broken (missed a day)
+      const last=new Date(G.lastPlayDate);const now=new Date(today);
+      const diff=Math.round((now-last)/(1000*60*60*24));
+      if(diff>1){G.dailyStreak=0;}
+      G.todayDone=false;
+    }
+  }catch(e){}
+}
+
+/* ==========================================================
+   SOUND
+========================================================== */
+let audioCtx=null;
+function getCtx(){if(!audioCtx){try{audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}return audioCtx;}
+function playTone(freq,dur,type='sine',vol=0.18){
+  if(!G.soundOn)return;
+  const ctx=getCtx();if(!ctx)return;
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.connect(g);g.connect(ctx.destination);
+  o.type=type;o.frequency.value=freq;
+  g.gain.setValueAtTime(vol,ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur);
+  o.start();o.stop(ctx.currentTime+dur);
+}
+function sndCorrect(){playTone(523,.06);setTimeout(()=>playTone(659,.06),80);setTimeout(()=>playTone(784,.12),160);}
+function sndWrong(){playTone(220,.08,'sawtooth',.12);setTimeout(()=>playTone(196,.12,'sawtooth',.1),100);}
+function sndClick(){playTone(440,.04,'sine',.06);}
+function sndLevelUp(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>playTone(f,.12),i*100));}
+function toggleSound(){G.soundOn=!G.soundOn;const b=document.getElementById('sound-btn');if(b){b.textContent=G.soundOn?'🔊':'🔇';b.classList.toggle('muted',!G.soundOn);}saveState();}
+
+/* ==========================================================
+   SCREEN NAV
+========================================================== */
+function goScreen(id){
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function goHome(){stopQuickTimer();buildPath();syncNav();syncDailyStreak();goScreen('s-home');}
+function syncNav(){
+  const str=document.getElementById('h-str'),xpEl=document.getElementById('h-xp'),lvEl=document.getElementById('h-lv');
+  if(str){animVal(str,G.streak);}
+  if(xpEl){animVal(xpEl,G.xp);}
+  if(lvEl){animVal(lvEl,G.lives);}
+  // update home XP bar
+  const xpIn=G.xp%XPL;
+  const lvl=Math.floor(G.xp/XPL)+1;
+  const homeLvl=document.getElementById('home-lvl');
+  const homeXpin=document.getElementById('home-xpin');
+  const homeXpfill=document.getElementById('home-xpfill');
+  if(homeLvl)homeLvl.textContent=lvl;
+  if(homeXpin)homeXpin.textContent=xpIn;
+  if(homeXpfill)setTimeout(()=>homeXpfill.style.width=(xpIn/XPL*100)+'%',100);
+  // sound btn
+  const sb=document.getElementById('sound-btn');
+  if(sb){sb.textContent=G.soundOn?'🔊':'🔇';sb.classList.toggle('muted',!G.soundOn);}
+}
+
+function syncDailyStreak(){
+  const fires=document.getElementById('ds-fires');
+  const lbl=document.getElementById('ds-lbl');
+  if(!fires)return;
+  const days=['L','M','M','J','V','S','D'];
+  const today=new Date().getDay(); // 0=Sun
+  const dayOrder=[1,2,3,4,5,6,0]; // Mon→Sun
+  fires.innerHTML=days.map((d,i)=>{
+    const dayIdx=dayOrder[i];
+    // a day is "lit" if it's within the daily streak
+    const daysAgo=(today-dayIdx+7)%7;
+    const lit=daysAgo<G.dailyStreak||(daysAgo===0&&G.todayDone);
+    return `<div class="ds-day"><div class="ds-fire ${lit?'lit':''}">🔥</div><div>${d}</div></div>`;
+  }).join('');
+  lbl.textContent=G.dailyStreak+' 🔥';
+}
+function animVal(el,val){
+  const cur=el.textContent;
+  if(cur!=val){el.textContent=val;el.classList.remove('bump');void el.offsetHeight;el.classList.add('bump');}
+}
+
+/* ==========================================================
+   PATH BUILD — SVG serpentine, professional
+========================================================== */
+const XFRAC = [0.5, 0.78, 0.22, 0.78, 0.50, 0.22, 0.78];
+let openIdx = -1;
+
+function buildPath(){
+  const wrap = document.getElementById('path');
+  wrap.innerHTML = '';
+
+  const NODE  = 76;
+  const HALF  = NODE / 2;
+  const ROW_H = 130;
+  const PAD_T = 20;
+  const LBL_H = 28; // space for label below node
+  const n     = CUR.length;
+
+  // Sequential unlock: lesson i unlocked if all previous are done (or i=0)
+  const unlocked = Math.min(G.completed.length + 1, CUR.length);
+
+  const totalH = (n - 1) * ROW_H + NODE + PAD_T + LBL_H + 16;
+  wrap.style.height = totalH + 'px';
+
+  const W = wrap.getBoundingClientRect().width || wrap.offsetWidth || 320;
+
+  const pts = CUR.map((_, i) => ({
+    x: XFRAC[i % XFRAC.length] * W,
+    y: PAD_T + i * ROW_H + HALF
+  }));
+
+  /* ── SVG CONNECTORS ── */
+  const NS  = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('width',  '100%');
+  svg.setAttribute('height', totalH);
+  svg.style.cssText = 'position:absolute;inset:0;pointer-events:none;overflow:visible;';
+
+  // Defs: gradient per segment
+  const defs = document.createElementNS(NS, 'defs');
+  svg.appendChild(defs);
+
+  for(let i = 1; i < n; i++){
+    const p1   = pts[i-1], p2 = pts[i];
+    const locked    = i >= unlocked;
+    const prevDone  = G.completed.includes(CUR[i-1].id);
+    const cy = (p1.y + p2.y) / 2;
+    const d  = `M ${p1.x} ${p1.y+HALF} C ${p1.x} ${cy} ${p2.x} ${cy} ${p2.x} ${p2.y-HALF}`;
+
+    // Glow layer (only for done connections)
+    if(prevDone && !locked){
+      const glow = document.createElementNS(NS, 'path');
+      glow.setAttribute('d', d);
+      glow.setAttribute('fill', 'none');
+      glow.setAttribute('stroke', CUR[i-1].nodeColor);
+      glow.setAttribute('stroke-width', '10');
+      glow.setAttribute('stroke-linecap', 'round');
+      glow.setAttribute('stroke-opacity', '0.12');
+      glow.setAttribute('filter', 'blur(4px)');
+      svg.appendChild(glow);
+    }
+
+    // Track shadow
+    const shadow = document.createElementNS(NS, 'path');
+    shadow.setAttribute('d', d);
+    shadow.setAttribute('fill', 'none');
+    shadow.setAttribute('stroke', '#060b11');
+    shadow.setAttribute('stroke-width', '14');
+    shadow.setAttribute('stroke-linecap', 'round');
+    svg.appendChild(shadow);
+
+    // Track body
+    const track = document.createElementNS(NS, 'path');
+    track.setAttribute('d', d);
+    track.setAttribute('fill', 'none');
+    track.setAttribute('stroke', locked ? '#141f2a' : '#1a2d3e');
+    track.setAttribute('stroke-width', '8');
+    track.setAttribute('stroke-linecap', 'round');
+    svg.appendChild(track);
+
+    // Progress fill
+    const fill = document.createElementNS(NS, 'path');
+    fill.setAttribute('d', d);
+    fill.setAttribute('fill', 'none');
+    fill.setAttribute('stroke', prevDone ? CUR[i-1].nodeColor : locked ? '#1a2638' : '#243a52');
+    fill.setAttribute('stroke-width', '4');
+    fill.setAttribute('stroke-linecap', 'round');
+    fill.setAttribute('stroke-opacity', prevDone ? '0.9' : '0.5');
+    fill.setAttribute('stroke-dasharray', locked ? '4 10' : prevDone ? 'none' : '8 8');
+    svg.appendChild(fill);
+  }
+
+  wrap.appendChild(svg);
+
+  /* ── NODES ── */
+  CUR.forEach((L, i) => {
+    const locked = i >= unlocked;
+    const done   = G.completed.includes(L.id);
+    const { x, y } = pts[i];
+
+    // Wrapper (larger to include label)
+    const nw = document.createElement('div');
+    nw.className  = 'nwrap';
+    nw.style.cssText = `
+      width:${NODE + 60}px;height:${NODE + LBL_H}px;
+      left:${x - HALF - 30}px;top:${y - HALF}px;
+      flex-direction:column;gap:6px;
+    `;
+
+    /* ── Button ── */
+    const btn = document.createElement('button');
+    btn.className = 'node' + (locked ? ' locked' : '') + (done ? ' done' : '');
+    btn.style.cssText = `
+      width:${NODE}px;height:${NODE}px;flex-shrink:0;
+      background:${locked
+        ? 'linear-gradient(145deg,#18293a,#111e2a)'
+        : done
+          ? `linear-gradient(145deg,${L.nodeColor}dd,${L.nodeColor})`
+          : `linear-gradient(145deg,${L.nodeColor}88,${L.nodeColor}bb)`};
+      box-shadow:${locked ? 'none' : done
+        ? `0 8px 0 ${L.nodeColor}44, 0 0 28px ${L.nodeColor}30, inset 0 1px 0 rgba(255,255,255,.2)`
+        : `0 6px 0 ${L.nodeColor}33, inset 0 1px 0 rgba(255,255,255,.15)`};
+    `;
+    btn.style.setProperty('--node-clr',  locked ? '#243a52' : L.nodeColor);
+    btn.style.setProperty('--node-prog', done ? '100%' : '0%');
+
+    // Emoji (hidden when locked via overlay)
+    const emoSpan = document.createElement('span');
+    emoSpan.style.cssText = 'font-size:2rem;line-height:1;display:block;';
+    emoSpan.textContent = L.icon;
+    btn.appendChild(emoSpan);
+
+    // ✓ badge
+    const badge = document.createElement('div');
+    badge.className   = 'node-done-badge';
+    badge.textContent = '✓';
+    btn.appendChild(badge);
+
+    // Lock overlay
+    if(locked){
+      const ov = document.createElement('div');
+      ov.style.cssText = `
+        position:absolute;inset:0;border-radius:50%;
+        background:rgba(6,11,17,.72);
+        display:flex;align-items:center;justify-content:center;
+        font-size:1.5rem;z-index:4;
+        backdrop-filter:blur(2px);
+      `;
+      ov.textContent = '🔒';
+      btn.appendChild(ov);
+    }
+
+    if(!locked) btn.addEventListener('click', e => { e.stopPropagation(); sndClick(); toggleCard(i); });
+
+    /* ── Label below node ── */
+    const lbl = document.createElement('div');
+    lbl.className = 'node-title' + (locked ? ' locked-lbl' : '');
+    lbl.textContent = L.title;
+    lbl.style.top = NODE + 8 + 'px';
+
+    /* ── Popup card ── */
+    const card = document.createElement('div');
+    card.className = 'ncard';
+    card.id        = 'nc' + i;
+    const onRight  = x > W * 0.60;
+    if(onRight){
+      card.style.cssText = 'left:auto;right:calc(100% - 30px);transform:none;top:96px;';
+    }
+    const c = L.nodeColor;
+    const btnGrad = `linear-gradient(135deg,${c},${c}cc)`;
+    card.innerHTML = `
+      ${onRight ? '' : '<div class="ncard-arrow"></div>'}
+      <span class="ncard-icon">${L.icon}</span>
+      <div class="ncard-title">${L.title}</div>
+      <div class="ncard-sub">${L.sub}</div>
+      <div class="ncard-divider"></div>
+      <div class="ncard-meta">
+        <span class="ncard-chip">${L.level}</span>
+        <span class="ncard-chip">📚 ${L.steps.length} étapes</span>
+        ${done ? `<span class="ncard-chip" style="color:${c};border-color:${c}33">✓ Complétée</span>` : ''}
+      </div>
+      <button class="ncard-btn" style="background:${btnGrad};box-shadow:0 5px 18px ${c}33,0 3px 0 ${c}77;">${done ? '🔄 Rejouer' : 'Commencer →'}</button>
+    `;
+    card.querySelector('.ncard-btn').addEventListener('click', e => {
+      e.stopPropagation(); closeCards(); sndClick(); openIntro(i);
+    });
+
+    nw.appendChild(btn);
+    nw.appendChild(lbl);
+    nw.appendChild(card);
+    wrap.appendChild(nw);
+  });
+}
+
+function toggleCard(i){
+  if(openIdx===i){closeCards();return;}
+  closeCards();
+  const c=document.getElementById('nc'+i);
+  if(c){c.classList.add('open');openIdx=i;document.getElementById('ov').classList.add('on');}
+}
+function closeCards(){
+  document.querySelectorAll('.ncard.open').forEach(c=>c.classList.remove('open'));
+  document.getElementById('ov').classList.remove('on');
+  openIdx=-1;
+}
+
+/* ==========================================================
+   QUICK LESSON
+========================================================== */
+function openQuickPicker(){
+  sndClick();
+  const grid=document.getElementById('qp-grid');
+  if(!grid)return;
+  const unlocked=Math.min(G.completed.length+1,CUR.length);
+  grid.innerHTML=CUR.map((L,i)=>{
+    const locked=i>=unlocked;
+    const qsteps=L.steps.filter(s=>s.k!=='theory').length;
+    const lvlColors={'🟢 Collège':'#39d353','🔵 Lycée':'#38bdf8','🟠 Prépa/L1':'#fb923c','🟣 Master':'#c084fc'};
+    const c=lvlColors[L.level]||'#39d353';
+    return `<button class="qp-card ${locked?'locked-card':''}" onclick="${locked?'':'startQuickLesson('+i+')'}">
+      <span class="qp-icon">${L.icon}</span>
+      <div class="qp-info">
+        <div class="qp-name">${L.title}</div>
+        <div class="qp-desc">${qsteps} question${qsteps>1?'s':''} · ${L.sub.split(':')[0]}</div>
+      </div>
+      <span class="qp-lvl" style="color:${c};border-color:${c}44">${locked?'🔒':L.level.split(' ')[0]}</span>
+      ${locked?'':'<span class="qp-arrow">›</span>'}
+    </button>`;
+  }).join('');
+  goScreen('s-quick');
+}
+
+function startQuickLesson(lessonIdx){
+  sndClick();
+  G.li=lessonIdx;
+  G.isQuick=true;
+  G.quickDone=false;
+  G.quickTimeLeft=QUICK_DURATION;
+  // pick random quiz steps (no theory), max 4
+  const allQ=CUR[lessonIdx].steps.map((s,i)=>({...s,_orig:i})).filter(s=>s.k!=='theory');
+  const picked=shuffle([...allQ]).slice(0,Math.min(4,allQ.length));
+  G.quickSteps=picked;
+  G.si=0;G.correct=0;G.wrong=0;G.answered=false;G.lives=5;
+  syncNav();
+  goScreen('s-lesson');
+  // show timer UI
+  document.getElementById('pbar-normal').style.display='none';
+  document.getElementById('tbar-quick').style.display='flex';
+  document.getElementById('timer-wrap').style.display='flex';
+  renderStep();
+  startQuickTimer();
+}
+
+function startQuickTimer(){
+  stopQuickTimer();
+  updateTimerDisplay();
+  G.quickTimer=setInterval(()=>{
+    G.quickTimeLeft--;
+    updateTimerDisplay();
+    if(G.quickTimeLeft<=0){
+      stopQuickTimer();
+      // time's up — end lesson
+      showResult(true);
+    }
+  },1000);
+}
+
+function stopQuickTimer(){
+  if(G.quickTimer){clearInterval(G.quickTimer);G.quickTimer=null;}
+}
+
+function updateTimerDisplay(){
+  const t=G.quickTimeLeft;
+  const m=Math.floor(t/60),s=t%60;
+  const str=m+':'+(s<10?'0':'')+s;
+  const tv=document.getElementById('timer-val');
+  const tw=document.getElementById('timer-wrap');
+  const tqf=document.getElementById('tqfill');
+  const urgent=t<=30;
+  if(tv){tv.textContent=str;tv.classList.toggle('urgent',urgent);}
+  if(tw){tw.classList.toggle('urgent',urgent);}
+  if(tqf){
+    tqf.style.width=(t/QUICK_DURATION*100)+'%';
+    tqf.classList.toggle('urgent',urgent);
+  }
+  // pulse sound at 30s
+  if(t===30)showToast('⏱ 30 secondes restantes !');
+}
+function openIntro(idx){
+  G.li=idx;const L=CUR[idx];
+  document.getElementById('ii-ico').textContent=L.icon;
+  document.getElementById('ii-title').textContent=L.title;
+  document.getElementById('ii-sub').textContent=L.sub;
+  document.getElementById('ii-steps').textContent=L.steps.length+' étapes';
+  document.getElementById('ii-lvl').textContent=L.level;
+  goScreen('s-intro');
+}
+
+/* ==========================================================
+   LESSON
+========================================================== */
+function startLesson(){
+  G.si=0;G.correct=0;G.wrong=0;G.answered=false;G.lives=5;
+  G.isQuick=false;
+  // restore normal progress bar
+  document.getElementById('pbar-normal').style.display='flex';
+  document.getElementById('tbar-quick').style.display='none';
+  document.getElementById('timer-wrap').style.display='none';
+  syncNav();goScreen('s-lesson');renderStep();
+}
+function replayLesson(){
+  if(G.isQuick){startQuickLesson(G.li);}else{startLesson();}
+}
+function quitLesson(){document.getElementById('quit-modal').classList.add('open');}
+function confirmQuit(){
+  stopQuickTimer();
+  document.getElementById('quit-modal').classList.remove('open');
+  G.lives=5;G.isQuick=false;
+  // restore UI
+  document.getElementById('pbar-normal').style.display='flex';
+  document.getElementById('tbar-quick').style.display='none';
+  document.getElementById('timer-wrap').style.display='none';
+  syncNav();goHome();
+}
+function cancelQuit(){document.getElementById('quit-modal').classList.remove('open');}
+
+function renderStep(){
+  const steps=G.isQuick?G.quickSteps:CUR[G.li].steps;
+  const step=steps[G.si];
+  const total=steps.length;
+
+  if(!G.isQuick){
+    const pct=(G.si/total*100);
+    const pfill=document.getElementById('pfill');
+    pfill.style.width=pct+'%';
+    pfill.style.setProperty('--pfill-show',pct>2?'1':'0');
+  }
+
+  const ctr=document.getElementById('step-ctr');
+  if(ctr)ctr.textContent=(G.si+1)+'/'+total;
+
+  const hts=document.getElementById('hts');
+  hts.innerHTML=[0,1,2,3,4].map(i=>`<span class="ht ${i>=G.lives?'gone':''}">❤️</span>`).join('');
+  G.answered=false;G.cur=null;
+  const el=document.getElementById('step');
+  el.className='step';void el.offsetHeight;el.className='step anim';
+  document.getElementById('lbody').scrollTop=0;
+  if(step.k==='theory') rTheory(el,step);
+  else if(step.k==='mcq') rMCQ(el,step);
+  else if(step.k==='fill') rFill(el,step);
+  else if(step.k==='pairs') rPairs(el,step);
+  else if(step.k==='word') rWord(el,step);
+}
+
+/* -- Theory -- */
+function rTheory(el,s){
+  setCTA('theory','Continuer →');
+  el.innerHTML=`<div class="tcard"><div class="thd"><div class="tico">${s.ico}</div><div><div class="tttl">${s.title}</div><div class="tsub">${s.sub}</div></div></div><div class="tbd">${s.html}</div></div>`;
+  el.querySelectorAll('.tab').forEach(t=>{
+    t.addEventListener('click',()=>{
+      const pid=t.dataset.pan;const scope=t.closest('.tbd');
+      scope.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+      scope.querySelectorAll('.tabpan').forEach(x=>x.classList.remove('on'));
+      t.classList.add('on');const pan=scope.querySelector('#'+pid);
+      if(pan)pan.classList.add('on');
+    });
+  });
+}
+
+/* -- MCQ -- */
+function rMCQ(el,s){
+  setCTA('idle','Vérifier');
+  const letters=['A','B','C','D'];
+  el.innerHTML=`<div class="qbadge">Choix multiple</div>
+    <div class="qtxt">${s.q}</div>
+    ${s.hint?`<button class="hint-btn" id="hint-btn" onclick="toggleHint(this,'${s.hint.replace(/'/g,"\\'")}')">💡 Afficher l'indice</button><div id="hint-box" class="qhint" style="display:none">${s.hint}</div>`:''}
+    <div class="kbhints">${letters.slice(0,s.opts.length).map((l,i)=>`<span class="kbh">${l}</span>`).join('')}</div>
+    <div class="opts" id="opts">${s.opts.map((o,i)=>`<button class="opt" data-i="${i}"><div class="oltr">${letters[i]}</div><span>${o}</span></button>`).join('')}</div>
+    <div class="fb" id="fb"></div>`;
+  el.querySelectorAll('.opt').forEach(b=>{
+    b.addEventListener('click',()=>{
+      if(G.answered)return;
+      sndClick();
+      G.cur=+b.dataset.i;
+      el.querySelectorAll('.opt').forEach(x=>{x.classList.remove('sel');});
+      b.classList.add('sel');
+      setCTA('ready','Vérifier');
+    });
+    // hover ripple effect
+    b.addEventListener('mousemove',e=>{const r=b.getBoundingClientRect();b.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');b.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%');});
+  });
+}
+
+/* -- Fill -- */
+function rFill(el,s){
+  setCTA('idle','Vérifier');
+  el.innerHTML=`<div class="qbadge">Compléter</div>
+    <div class="qtxt">${s.q}</div>
+    ${s.hint?`<button class="hint-btn" id="hint-btn" onclick="toggleHint(this,'${s.hint.replace(/'/g,"\\'")}')">💡 Afficher l'indice</button><div id="hint-box" class="qhint" style="display:none">${s.hint}</div>`:''}
+    <input class="finp" id="finp" placeholder="${s.ph||'Ta réponse'}" autocomplete="off" autocorrect="off" spellcheck="false">
+    <div class="fb" id="fb"></div>`;
+  const inp=el.querySelector('#finp');
+  inp.addEventListener('input',()=>{G.cur=inp.value.trim();setCTA(G.cur?'ready':'idle','Vérifier');});
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&G.cur)handleCTA();});
+  setTimeout(()=>inp.focus(),80);
+}
+
+/* -- Pairs -- */
+function rPairs(el,s){
+  setCTA('idle','Vérifier');
+  const left=shuffle(s.pairs.map(p=>p[0]));
+  const right=shuffle(s.pairs.map(p=>p[1]));
+  G.ps={pairs:s.pairs,sel:null,matched:[]};
+  el.innerHTML=`<div class="qbadge">Associer les paires</div>
+    <div class="qtxt">${s.q}</div>
+    <div class="pgrid" id="pgrid">
+      ${left.map(v=>`<button class="pbtn" data-side="L" data-val="${v}">${v}</button>`).join('')}
+      ${right.map(v=>`<button class="pbtn" data-side="R" data-val="${v}">${v}</button>`).join('')}
+    </div>
+    <div class="fb" id="fb"></div>`;
+  el.querySelectorAll('.pbtn').forEach(b=>b.addEventListener('click',()=>{sndClick();clickPair(b,s);}));
+}
+
+function clickPair(btn,s){
+  if(G.answered||btn.classList.contains('done'))return;
+  const ps=G.ps,val=btn.dataset.val,side=btn.dataset.side;
+  if(!ps.sel){ps.sel={val,side,btn};btn.classList.add('sel');return;}
+  if(ps.sel.side===side){ps.sel.btn.classList.remove('sel');ps.sel={val,side,btn};btn.classList.add('sel');return;}
+  const L=side==='L'?val:ps.sel.val,R=side==='R'?val:ps.sel.val;
+  const ok=s.pairs.some(p=>p[0]===L&&p[1]===R);
+  if(ok){
+    btn.classList.add('done');btn.classList.remove('sel');
+    ps.sel.btn.classList.add('done');ps.sel.btn.classList.remove('sel');
+    ps.matched.push(L);ps.sel=null;
+    sndClick();
+    if(ps.matched.length===s.pairs.length){G.cur='done';setCTA('ready','Vérifier');}
+  } else {
+    const a=btn,b2=ps.sel.btn;ps.sel=null;
+    [a,b2].forEach(x=>{x.classList.add('err');x.classList.remove('sel');setTimeout(()=>x.classList.remove('err'),400);});
+    sndWrong();
+  }
+}
+
+/* -- Word Order -- */
+function rWord(el,s){
+  setCTA('idle','Vérifier');
+  G.ws={placed:[],bank:shuffle([...s.words]),ans:s.ans};
+  el.innerHTML=`<div class="qbadge">Remettre en ordre</div>
+    <div class="qtxt">${s.q}</div>
+    <div class="slots" id="slots"></div>
+    <div class="bank" id="bank"></div>
+    <div class="fb" id="fb"></div>`;
+  refreshWord(el,s);
+}
+
+function refreshWord(el,s){
+  const ws=G.ws;
+  const slots=el.querySelector('#slots'),bank=el.querySelector('#bank');
+  if(ws.placed.length===0){
+    slots.innerHTML='<span class="sph">Place les mots ici…</span>';
+    slots.classList.remove('has-items');
+  } else {
+    slots.innerHTML=ws.placed.map((w,i)=>`<div class="wc placed" data-pi="${i}">${w}</div>`).join('');
+    slots.classList.add('has-items');
+    slots.querySelectorAll('.wc.placed').forEach(c=>{
+      c.addEventListener('click',()=>{if(!G.answered){sndClick();ws.placed.splice(+c.dataset.pi,1);refreshWord(el,s);}});
+    });
+  }
+  const used={};ws.placed.forEach(w=>used[w]=(used[w]||0)+1);
+  const bankItems=[];const counted={};
+  ws.bank.forEach((w,i)=>{counted[w]=(counted[w]||0)+1;const usedCount=used[w]||0;const exhausted=counted[w]<=usedCount;bankItems.push(`<div class="wc ${exhausted?'used':''}" data-wi="${i}">${w}</div>`);});
+  bank.innerHTML=bankItems.join('');
+  bank.querySelectorAll('.wc:not(.used)').forEach(c=>{
+    c.addEventListener('click',()=>{if(!G.answered){sndClick();ws.placed.push(ws.bank[+c.dataset.wi]);refreshWord(el,s);}});
+  });
+  G.cur=ws.placed.join(' ');
+  const total=s.ans.split(' ').length;
+  setCTA(ws.placed.length===total?'ready':'idle','Vérifier');
+}
+
+/* -- Hint -- */
+function toggleHint(btn,hint){
+  const box=document.getElementById('hint-box');
+  if(box){
+    const hidden=box.style.display==='none';
+    box.style.display=hidden?'flex':'none';
+    btn.textContent=hidden?'💡 Masquer l\'indice':'💡 Afficher l\'indice';
+  }
+}
+
+/* ==========================================================
+   KEYBOARD SHORTCUTS
+========================================================== */
+document.addEventListener('keydown',e=>{
+  const s=document.querySelector('.scr.active');
+  if(!s)return;
+  if(s.id==='s-lesson'){
+    // 1-4 for MCQ
+    if(['1','2','3','4'].includes(e.key)){
+      const idx=+e.key-1;
+      const opts=document.querySelectorAll('.opt:not([disabled])');
+      if(opts[idx]&&!G.answered)opts[idx].click();
+    }
+    // Enter for CTA
+    if(e.key==='Enter'&&!e.shiftKey)handleCTA();
+    // Escape for quit
+    if(e.key==='Escape')quitLesson();
+  }
+});
+
+/* ==========================================================
+   CTA
+========================================================== */
+function setCTA(state,label){
+  const btn=document.getElementById('cta');if(!btn)return;
+  btn.textContent=label;
+  btn.className='cta '+(state==='idle'?'idle':state==='ready'?'rdy':state==='cont'?'cont':'theory');
+  btn.disabled=(state==='idle');
+  G.cstate=state;
+}
+
+function handleCTA(){
+  if(G.cstate==='idle')return;
+  if(G.cstate==='theory'||G.cstate==='cont'){advance();return;}
+  if(G.cstate==='ready')checkAns();
+}
+
+/* ==========================================================
+   CHECK ANSWER
+========================================================== */
+function checkAns(){
+  if(G.answered)return;
+  G.answered=true;
+  const steps=G.isQuick?G.quickSteps:CUR[G.li].steps;
+  const step=steps[G.si];
+  let ok=false;
+
+  if(step.k==='mcq'){
+    ok=G.cur===step.ans;
+    document.querySelectorAll('.opt').forEach((b,i)=>{
+      b.disabled=true;b.classList.remove('sel');
+      if(i===step.ans)b.classList.add('ok');
+      else if(i===G.cur&&!ok)b.classList.add('bad');
+    });
+  } else if(step.k==='fill'){
+    const raw=(G.cur||'').toLowerCase().replace(/\s/g,'').replace(',','.');
+    const acc=step.acc.map(a=>a.toLowerCase().replace(/\s/g,'').replace(',','.'));
+    ok=acc.includes(raw);
+    const inp=document.getElementById('finp');
+    if(inp){inp.disabled=true;inp.classList.add(ok?'ok':'bad');if(!ok)inp.value=step.ans;}
+  } else if(step.k==='pairs'){
+    ok=G.cur==='done';
+  } else if(step.k==='word'){
+    ok=G.cur===step.ans;
+  }
+
+  const fb=document.getElementById('fb');
+  if(fb){fb.className='fb '+(ok?'ok':'bad');fb.style.display='block';
+    fb.innerHTML=`<div class="fb-ttl">${ok?'✓ Correct !':'✗ Pas tout à fait…'}</div><div class="fb-bd">${step.expl}</div>`;}
+
+  if(ok){
+    G.correct++;const xp=10+G.streak*2;G.xp+=xp;G.streak++;
+    sndCorrect();
+    fx(['⭐','✨','💫','🌟']);fxXP('+'+xp+' XP');
+    if(G.streak>0&&G.streak%3===0)showToast('🔥 Série de '+G.streak+' !');
+  } else {
+    G.wrong++;G.streak=0;G.lives=Math.max(0,G.lives-1);
+    sndWrong();
+    document.querySelectorAll('.ht')[G.lives]?.classList.add('gone');
+  }
+  syncNav();saveState();
+  setCTA('cont','Continuer →');
+}
+
+function advance(){
+  const steps=G.isQuick?G.quickSteps:CUR[G.li].steps;
+  G.si++;
+  if(G.si>=steps.length||G.lives<=0){showResult();return;}
+  renderStep();
+}
+
+/* ==========================================================
+   RESULT
+========================================================== */
+function showResult(timedOut=false){
+  stopQuickTimer();
+
+  // Restore lesson header UI
+  document.getElementById('pbar-normal').style.display='flex';
+  document.getElementById('tbar-quick').style.display='none';
+  document.getElementById('timer-wrap').style.display='none';
+
+  // Mark completed (normal lesson)
+  const lid=CUR[G.li].id;
+  if(!G.isQuick&&!G.completed.includes(lid))G.completed.push(lid);
+
+  // Daily streak logic
+  const total=G.correct+G.wrong||1;
+  const acc=Math.round(G.correct/total*100);
+  const quickSuccess=G.isQuick&&!timedOut&&acc>=50&&G.quickTimeLeft>0;
+  const normalSuccess=!G.isQuick&&acc>=50;
+  const earnedFlame=quickSuccess||normalSuccess;
+
+  const banner=document.getElementById('quick-result-banner');
+  if(banner)banner.style.display='none';
+
+  if(earnedFlame&&!G.todayDone){
+    G.todayDone=true;
+    const today=todayKey();
+    if(G.lastPlayDate===today){
+      // already counted today
+    } else {
+      G.dailyStreak++;
+    }
+    G.lastPlayDate=today;
+    if(banner){banner.style.display='flex';banner.style.justifyContent='center';}
+    setTimeout(()=>{fx(['🔥','🔥','⭐','✨'],8);sndLevelUp();},200);
+    showToast('🔥 Flamme maintenue ! '+G.dailyStreak+' jour'+( G.dailyStreak>1?'s':''));
+  }
+
+  document.getElementById('r-cor').textContent=G.correct+'/'+total;
+  document.getElementById('r-xp').textContent='+'+G.xp;
+  document.getElementById('r-acc').textContent=acc+'%';
+
+  let owl,title,sub;
+  if(timedOut){owl='⏱';title='Temps écoulé !';sub='Tu n\'as pas eu le temps de finir. Réessaie !';}
+  else if(acc>=90){owl='🦉';title='Incroyable !';sub='Tu maîtrises le sujet comme un champion !';}
+  else if(acc>=70){owl='🎯';title='Bien joué !';sub='Encore un peu et tu seras imbattable !';}
+  else if(acc>=50){owl='📚';title='En progrès !';sub='La pratique régulière fait la différence !';}
+  else{owl='💪';title='Ne lâche pas !';sub='Relis le cours et réessaie. Tu vas y arriver !';}
+  if(G.lives<=0&&!timedOut)sub+=' (toutes les vies épuisées…)';
+
+  document.getElementById('r-owl').textContent=owl;
+  document.getElementById('r-title').textContent=title;
+  document.getElementById('r-sub').textContent=sub;
+
+  const nl=Math.floor(G.xp/XPL)+1;
+  if(nl>G.level){G.level=nl;showToast('🎉 Niveau '+G.level+' atteint !');sndLevelUp();}
+  document.getElementById('r-lvl').textContent=G.level;
+  const xpIn=G.xp%XPL;
+  document.getElementById('r-xplbl').textContent=xpIn+' / '+XPL+' XP';
+  setTimeout(()=>document.getElementById('r-xpfill').style.width=(xpIn/XPL*100)+'%',400);
+
+  G.lives=5;G.isQuick=false;syncNav();saveState();
+
+  if(acc>=70&&!timedOut)setTimeout(()=>fx(['🎊','🎉','⭐','✨','💫'],12),400);
+
+  goScreen('s-result');
+}
+
+/* ==========================================================
+   FX
+========================================================== */
+function fx(em,count=6){
+  for(let i=0;i<count;i++) setTimeout(()=>{
+    const e=document.createElement('div');e.className='particle';
+    e.textContent=em[~~(Math.random()*em.length)];
+    e.style.left=(10+Math.random()*80)+'vw';
+    e.style.top=(30+Math.random()*30)+'vh';
+    document.body.appendChild(e);
+    setTimeout(()=>e.remove(),1300);
+  },i*70);
+}
+function fxXP(t){
+  const e=document.createElement('div');e.className='xppop';
+  e.textContent=t;e.style.left='50vw';e.style.top='40vh';
+  document.body.appendChild(e);setTimeout(()=>e.remove(),900);
+}
+function showToast(msg){
+  document.querySelectorAll('.toast').forEach(x=>x.remove());
+  const e=document.createElement('div');e.className='toast';e.textContent=msg;
+  document.body.appendChild(e);setTimeout(()=>e.remove(),2600);
+}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=~~(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+/* BOOT */
+loadState();
+buildPath();syncNav();syncDailyStreak();
+</script>
+</body>
+</html>
