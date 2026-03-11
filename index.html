@@ -24,6 +24,9 @@ body{
   background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;
   display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:relative;
 }
+@media(min-width:600px){
+  body{max-width:660px;}
+}
 
 /* Animated background grid */
 body::before{
@@ -706,12 +709,181 @@ body::before{
 ::-webkit-scrollbar{width:3px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:99px;}
+
+/* ── FILTER BAR ── */
+.filter-bar{
+  display:flex;gap:7px;overflow-x:auto;padding-bottom:12px;margin-bottom:4px;
+  scrollbar-width:none;-ms-overflow-style:none;
+}
+.filter-bar::-webkit-scrollbar{display:none;}
+.filter-chip{
+  flex-shrink:0;display:flex;align-items:center;gap:5px;
+  background:var(--surf2);border:1px solid var(--bdr2);border-radius:99px;
+  padding:5px 13px;font-size:.7rem;font-weight:800;color:var(--muted2);
+  cursor:pointer;transition:all .18s;font-family:'Nunito',sans-serif;
+  -webkit-user-select:none;user-select:none;
+}
+.filter-chip:active{transform:scale(.94);}
+.filter-chip.on{color:var(--text);border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.07);}
+.filter-chip.on.fc-green{border-color:var(--green);background:rgba(57,211,83,.1);color:var(--green);}
+.filter-chip.on.fc-blue{border-color:var(--blue);background:rgba(56,189,248,.1);color:var(--blue);}
+.filter-chip.on.fc-orange{border-color:var(--orange);background:rgba(251,146,60,.1);color:var(--orange);}
+.filter-chip.on.fc-purple{border-color:var(--purple);background:rgba(192,132,252,.1);color:var(--purple);}
+
+/* ── STATS SCREEN ── */
+#s-stats{overflow-y:auto;}
+#s-stats .stat-body{flex:1;overflow-y:auto;padding:16px 16px 80px;}
+.stat-hero{
+  background:linear-gradient(135deg,rgba(57,211,83,.08),rgba(56,189,248,.06));
+  border:1px solid rgba(57,211,83,.18);border-radius:var(--radius);
+  padding:22px 20px;margin-bottom:16px;text-align:center;
+}
+.stat-hero-owl{font-size:3.5rem;margin-bottom:8px;display:block;}
+.stat-hero-name{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:4px;}
+.stat-hero-lvl{font-size:.78rem;color:var(--muted2);}
+.stat-hero-xpbar{height:8px;background:var(--surf3);border-radius:99px;overflow:hidden;margin-top:10px;}
+.stat-hero-xpfill{height:100%;background:linear-gradient(90deg,var(--gold),#f59e0b);border-radius:99px;transition:width .8s cubic-bezier(.34,1.56,.64,1);}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px;}
+.stat-card{
+  background:var(--surf2);border:1px solid var(--bdr2);border-radius:var(--radius-sm);
+  padding:16px 14px;text-align:center;
+}
+.stat-num{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;margin-bottom:4px;}
+.stat-lbl{font-size:.62rem;color:var(--muted2);font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+.stat-section{margin-bottom:16px;}
+.stat-section-title{font-family:'Syne',sans-serif;font-size:.78rem;font-weight:800;color:var(--muted2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;}
+.stat-lesson-row{
+  display:flex;align-items:center;gap:12px;
+  background:var(--surf2);border:1px solid var(--bdr2);border-radius:var(--radius-sm);
+  padding:12px 14px;margin-bottom:7px;
+}
+.stat-lesson-icon{font-size:1.5rem;flex-shrink:0;}
+.stat-lesson-info{flex:1;}
+.stat-lesson-name{font-weight:800;font-size:.85rem;margin-bottom:2px;}
+.stat-lesson-lvl{font-size:.68rem;color:var(--muted2);}
+.stat-lesson-check{font-size:1.1rem;}
+.stat-danger-zone{
+  background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.2);border-radius:var(--radius-sm);
+  padding:16px;margin-top:16px;
+}
+.stat-danger-title{font-family:'Syne',sans-serif;font-size:.8rem;font-weight:800;color:var(--red);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.stat-danger-btn{
+  width:100%;border:1px solid rgba(248,113,113,.35);border-radius:var(--radius-xs);
+  background:rgba(248,113,113,.08);color:var(--red);
+  padding:12px;font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800;
+  cursor:pointer;transition:all .15s;
+}
+.stat-danger-btn:active{transform:scale(.97);background:rgba(248,113,113,.15);}
+
+/* ── SAVE EXPORT/IMPORT ── */
+.save-zone{
+  background:linear-gradient(135deg,rgba(56,189,248,.05),rgba(57,211,83,.04));
+  border:1px solid rgba(56,189,248,.2);border-radius:var(--radius-sm);
+  padding:16px;margin-top:14px;
+}
+.save-zone-title{
+  font-family:'Syne',sans-serif;font-size:.8rem;font-weight:800;
+  color:var(--blue);margin-bottom:12px;display:flex;align-items:center;gap:6px;
+}
+.save-btns{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.save-btn{
+  border:none;border-radius:var(--radius-xs);padding:13px 10px;
+  font-family:'Syne',sans-serif;font-size:.8rem;font-weight:800;
+  cursor:pointer;transition:all .15s;display:flex;flex-direction:column;
+  align-items:center;gap:5px;
+}
+.save-btn:active{transform:scale(.96);}
+.save-btn.export{
+  background:linear-gradient(135deg,rgba(56,189,248,.15),rgba(56,189,248,.08));
+  border:1px solid rgba(56,189,248,.35);color:var(--blue);
+}
+.save-btn.export:active{background:rgba(56,189,248,.22);}
+.save-btn.import{
+  background:linear-gradient(135deg,rgba(57,211,83,.12),rgba(57,211,83,.06));
+  border:1px solid rgba(57,211,83,.3);color:var(--green);
+}
+.save-btn.import:active{background:rgba(57,211,83,.2);}
+.save-btn-ico{font-size:1.5rem;line-height:1;}
+.save-btn-lbl{font-size:.72rem;letter-spacing:.3px;}
+.save-info{
+  font-size:.68rem;color:var(--muted);margin-top:10px;line-height:1.55;
+  text-align:center;
+}
+/* import success flash */
+@keyframes importflash{
+  0%{box-shadow:0 0 0 0 rgba(57,211,83,.5);}
+  50%{box-shadow:0 0 0 8px rgba(57,211,83,.1);}
+  100%{box-shadow:0 0 0 0 rgba(57,211,83,0);}
+}
+.save-zone.imported{animation:importflash .6s ease;}
+
+/* ── FICHES REVIEW SCREEN ── */
+#s-fiches{overflow-y:hidden;}
+#s-fiches .fiche-body{flex:1;overflow-y:auto;padding:16px 16px 80px;}
+.fiche-card{
+  background:var(--surf2);border:1px solid var(--bdr2);border-radius:var(--radius);
+  padding:16px;margin-bottom:10px;cursor:pointer;transition:all .18s;
+}
+.fiche-card:active{transform:scale(.99);}
+.fiche-card-hd{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.fiche-card-ico{font-size:1.6rem;flex-shrink:0;}
+.fiche-card-title{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:800;}
+.fiche-card-sub{font-size:.7rem;color:var(--muted2);margin-top:1px;}
+.fiche-preview{font-size:.78rem;color:var(--muted2);line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.fiche-empty{text-align:center;padding:60px 20px;color:var(--muted2);}
+.fiche-empty-ico{font-size:3.5rem;margin-bottom:12px;display:block;}
+.fiche-empty-txt{font-size:.85rem;line-height:1.6;}
+
+/* Bottom nav bar */
+.nav-bar{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:8px 0 calc(8px + env(safe-area-inset-bottom));
+  background:rgba(8,14,20,.95);border-top:1px solid var(--bdr);
+  display:flex;align-items:stretch;z-index:50;
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+}
+.nav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;padding:4px 0;cursor:pointer;transition:all .18s;font-size:.58rem;
+  font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:var(--muted);
+  border:none;background:none;font-family:'Nunito',sans-serif;
+}
+.nav-item:active{transform:scale(.9);}
+.nav-item.on{color:var(--green);}
+.nav-ico{font-size:1.3rem;line-height:1;}
+
+/* Adjust home body padding for bottom nav */
+#s-home .body{padding-bottom:80px !important;}
+
+/* ── TABLET RESPONSIVE ── */
+@media(min-width:600px){
+  .tbar{padding:14px 22px;}
+  .tbar-logo{font-size:1.55rem;}
+  #s-home .body{padding:18px 22px 90px;}
+  .node{width:90px;height:90px;}
+  .ncard{width:270px;}
+  .sh-title{font-size:1.4rem;}
+  .quick-btn{padding:17px 20px;}
+  .qp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .rtiles{max-width:420px;}
+  .rbtns{max-width:420px;}
+  .xpsec{max-width:420px;}
+  .stat-grid{grid-template-columns:repeat(3,1fr);}
+  .filter-bar{gap:9px;}
+  .pgrid{gap:12px;}
+  .step{max-width:580px;}
+  .lbody{padding:20px 22px 120px;}
+  .opts{gap:10px;}
+  .opt{font-size:.95rem;padding:15px 18px;}
+  .fiche-body{padding:18px 22px 90px;}
+  .stat-body{padding:18px 22px 90px;}
+}
 </style>
 </head>
 <body>
 
 <!-- QUIT MODAL -->
-<div class="modal-bg" id="quit-modal">
+<div class="modal-bg" id="quit-modal" onclick="if(event.target===this)cancelQuit()">
   <div class="modal">
     <div class="modal-ico">🚪</div>
     <div class="modal-title">Quitter la leçon ?</div>
@@ -750,6 +922,16 @@ body::before{
       <div class="ds-fires" id="ds-fires"></div>
       <div class="ds-lbl" id="ds-lbl">0 🔥</div>
     </div>
+    <!-- Filter bar -->
+    <div class="filter-bar" id="filter-bar">
+      <button class="filter-chip" id="fc-all" onclick="setFilter(null)">🗺️ Tout</button>
+      <button class="filter-chip fc-green" id="fc-college" onclick="setFilter('Collège')">🟢 Collège</button>
+      <button class="filter-chip fc-green" id="fc-1re" onclick="setFilter('1re')">🌿 1re</button>
+      <button class="filter-chip fc-blue" id="fc-lycee" onclick="setFilter('Lycée')">🔵 Lycée</button>
+      <button class="filter-chip fc-blue" id="fc-terminale" onclick="setFilter('Terminale')">🎯 Terminale</button>
+      <button class="filter-chip fc-orange" id="fc-prepa" onclick="setFilter('Prépa')">🟠 Prépa</button>
+      <button class="filter-chip fc-purple" id="fc-master" onclick="setFilter('Master')">🟣 Master</button>
+    </div>
     <!-- Quick Lesson Button -->
     <button class="quick-btn" onclick="openQuickPicker()">
       <span class="quick-btn-ico">⚡</span>
@@ -762,6 +944,13 @@ body::before{
     <div class="path" id="path"></div>
   </div>
   <div class="ov" id="ov" onclick="closeCards()"></div>
+  <!-- Bottom nav -->
+  <div class="nav-bar">
+    <button class="nav-item on" id="nav-home" onclick="goHome()"><span class="nav-ico">🗺️</span>Carte</button>
+    <button class="nav-item" id="nav-fiches" onclick="showFiches()"><span class="nav-ico">📖</span>Fiches</button>
+    <button class="nav-item" id="nav-stats" onclick="showStats()"><span class="nav-ico">📊</span>Stats</button>
+    <button class="nav-item" id="nav-sound" onclick="toggleSound()"><span class="nav-ico" id="nav-sound-ico">🔊</span>Son</button>
+  </div>
 </div>
 
 <!-- INTRO -->
@@ -857,6 +1046,41 @@ body::before{
   <div class="rbtns">
     <button class="rbtn g" onclick="replayLesson()">🔄 Rejouer la leçon</button>
     <button class="rbtn gh" onclick="goHome()">🗺️ Retour à la carte</button>
+  </div>
+</div>
+
+<!-- STATS SCREEN -->
+<div class="scr" id="s-stats">
+  <div class="tbar">
+    <button class="bx" onclick="goHome()">←</button>
+    <div style="flex:1;font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;">Mes Statistiques 📊</div>
+  </div>
+  <div class="stat-body" id="stat-body">
+    <!-- filled by JS -->
+  </div>
+</div>
+
+<!-- FICHES SCREEN -->
+<div class="scr" id="s-fiches">
+  <div class="tbar">
+    <button class="bx" onclick="goHome()">←</button>
+    <div style="flex:1;font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;">Fiches de Révision 📖</div>
+  </div>
+  <div class="fiche-body" id="fiche-body">
+    <!-- filled by JS -->
+  </div>
+</div>
+
+<!-- CONFIRM RESET MODAL -->
+<div class="modal-bg" id="reset-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <div class="modal-ico">⚠️</div>
+    <div class="modal-title">Réinitialiser la progression ?</div>
+    <div class="modal-sub">Tout ton XP, tes leçons complétées et ta série seront effacés. Cette action est irréversible.</div>
+    <div class="modal-btns">
+      <button class="mbtn red" onclick="confirmReset()">Oui, tout effacer</button>
+      <button class="mbtn gh" onclick="document.getElementById('reset-modal').classList.remove('open')">Annuler</button>
+    </div>
   </div>
 </div>
 
@@ -1529,7 +1753,11 @@ let G = {
   // daily streak
   dailyStreak:0,lastPlayDate:'',todayDone:false,
   // quick mode
-  isQuick:false,quickSteps:[],quickTimeLeft:QUICK_DURATION,quickTimer:null,quickDone:false
+  isQuick:false,quickSteps:[],quickTimeLeft:QUICK_DURATION,quickTimer:null,quickDone:false,
+  // global accuracy tracking
+  totalCorrect:0,totalAnswers:0,
+  // filter
+  activeFilter:null
 };
 
 function todayKey(){return new Date().toISOString().slice(0,10);}
@@ -1537,7 +1765,8 @@ function todayKey(){return new Date().toISOString().slice(0,10);}
 function saveState(){
   try{localStorage.setItem('physingo',JSON.stringify({
     xp:G.xp,streak:G.streak,level:G.level,completed:G.completed,soundOn:G.soundOn,
-    dailyStreak:G.dailyStreak,lastPlayDate:G.lastPlayDate,todayDone:G.todayDone
+    dailyStreak:G.dailyStreak,lastPlayDate:G.lastPlayDate,todayDone:G.todayDone,
+    totalCorrect:G.totalCorrect,totalAnswers:G.totalAnswers
   }));}catch(e){}
 }
 function loadState(){
@@ -1551,6 +1780,8 @@ function loadState(){
     if(d.dailyStreak!=null)G.dailyStreak=d.dailyStreak;
     if(d.lastPlayDate)G.lastPlayDate=d.lastPlayDate;
     if(d.todayDone!=null)G.todayDone=d.todayDone;
+    if(d.totalCorrect!=null)G.totalCorrect=d.totalCorrect;
+    if(d.totalAnswers!=null)G.totalAnswers=d.totalAnswers;
     // reset todayDone if a new day
     const today=todayKey();
     if(G.lastPlayDate && G.lastPlayDate !== today){
@@ -1582,7 +1813,7 @@ function sndCorrect(){playTone(523,.06);setTimeout(()=>playTone(659,.06),80);set
 function sndWrong(){playTone(220,.08,'sawtooth',.12);setTimeout(()=>playTone(196,.12,'sawtooth',.1),100);}
 function sndClick(){playTone(440,.04,'sine',.06);}
 function sndLevelUp(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>playTone(f,.12),i*100));}
-function toggleSound(){G.soundOn=!G.soundOn;const b=document.getElementById('sound-btn');if(b){b.textContent=G.soundOn?'🔊':'🔇';b.classList.toggle('muted',!G.soundOn);}saveState();}
+function toggleSound(){G.soundOn=!G.soundOn;const b=document.getElementById('sound-btn');if(b){b.textContent=G.soundOn?'🔊':'🔇';b.classList.toggle('muted',!G.soundOn);}const nb=document.getElementById('nav-sound-ico');if(nb)nb.textContent=G.soundOn?'🔊':'🔇';saveState();}
 
 /* ==========================================================
    SCREEN NAV
@@ -1590,8 +1821,13 @@ function toggleSound(){G.soundOn=!G.soundOn;const b=document.getElementById('sou
 function goScreen(id){
   document.querySelectorAll('.scr').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  // sync bottom nav
+  ['home','stats','fiches'].forEach(k=>{
+    const el=document.getElementById('nav-'+k);
+    if(el)el.classList.toggle('on',id==='s-'+k);
+  });
 }
-function goHome(){stopQuickTimer();buildPath();syncNav();syncDailyStreak();goScreen('s-home');}
+function goHome(){stopQuickTimer();buildPath();syncNav();syncDailyStreak();setFilter(G.activeFilter,true);goScreen('s-home');}
 function syncNav(){
   const str=document.getElementById('h-str'),xpEl=document.getElementById('h-xp'),lvEl=document.getElementById('h-lv');
   if(str){animVal(str,G.streak);}
@@ -1609,7 +1845,292 @@ function syncNav(){
   // sound btn
   const sb=document.getElementById('sound-btn');
   if(sb){sb.textContent=G.soundOn?'🔊':'🔇';sb.classList.toggle('muted',!G.soundOn);}
+  const nb=document.getElementById('nav-sound-ico');
+  if(nb)nb.textContent=G.soundOn?'🔊':'🔇';
 }
+
+/* ==========================================================
+   FILTER
+========================================================== */
+G.activeFilter = null;
+
+function setFilter(level, silent){
+  G.activeFilter = level;
+  // update chips UI
+  const chipMap = {null:'fc-all','Collège':'fc-college','1re':'fc-1re','Lycée':'fc-lycee','Terminale':'fc-terminale','Prépa':'fc-prepa','Master':'fc-master'};
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('on'));
+  const id = chipMap[level];
+  if(id){const el=document.getElementById(id);if(el)el.classList.add('on');}
+  // dim non-matching nodes
+  document.querySelectorAll('.nwrap').forEach((nw,i)=>{
+    if(i<CUR.length){
+      const match = !level || CUR[i].level.includes(level);
+      nw.style.opacity = match ? '1' : '0.2';
+      nw.style.filter = match ? '' : 'grayscale(1)';
+    }
+  });
+}
+
+/* ==========================================================
+   STATS SCREEN
+========================================================== */
+function showStats(){
+  sndClick();
+  const body = document.getElementById('stat-body');
+  const total = CUR.length;
+  const done  = G.completed.length;
+  const lvl   = Math.floor(G.xp/XPL)+1;
+  const xpIn  = G.xp%XPL;
+  const acc   = G.totalAnswers>0 ? Math.round(G.totalCorrect/G.totalAnswers*100) : 0;
+  const lvlColors={'🟢 Collège':'var(--green)','🟢 1re':'var(--green)','🔵 Lycée':'var(--blue)','🔵 Terminale':'var(--blue)','🟠 Prépa/L1':'var(--orange)','🟣 Master':'var(--purple)'};
+
+  const owls=['🌱','📚','🎯','⭐','🏆','🦉','🔬','⚡','💎','🌟'];
+  const owl = owls[Math.min(lvl-1, owls.length-1)];
+
+  body.innerHTML = `
+    <div class="stat-hero">
+      <span class="stat-hero-owl">${owl}</span>
+      <div class="stat-hero-name">Niveau ${lvl}</div>
+      <div class="stat-hero-lvl">${xpIn} / ${XPL} XP pour le prochain niveau</div>
+      <div class="stat-hero-xpbar"><div class="stat-hero-xpfill" id="sh-xpf" style="width:0%"></div></div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-num" style="color:var(--gold)">${G.xp}</div>
+        <div class="stat-lbl">XP Total</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color:var(--green)">${done}/${total}</div>
+        <div class="stat-lbl">Leçons</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color:var(--orange)">${G.dailyStreak}</div>
+        <div class="stat-lbl">Jours 🔥</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color:var(--blue)">${acc}%</div>
+        <div class="stat-lbl">Précision</div>
+      </div>
+    </div>
+    <div class="stat-section">
+      <div class="stat-section-title">Progression des leçons</div>
+      ${CUR.map(L=>{
+        const c=lvlColors[L.level]||'var(--green)';
+        const isD=G.completed.includes(L.id);
+        return `<div class="stat-lesson-row">
+          <span class="stat-lesson-icon">${L.icon}</span>
+          <div class="stat-lesson-info">
+            <div class="stat-lesson-name">${L.title}</div>
+            <div class="stat-lesson-lvl" style="color:${c}">${L.level}</div>
+          </div>
+          <span class="stat-lesson-check">${isD?'✅':'⬜'}</span>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="stat-danger-zone">
+      <div class="stat-danger-title">⚠️ Zone danger</div>
+      <button class="stat-danger-btn" onclick="document.getElementById('reset-modal').classList.add('open')">🗑️ Réinitialiser ma progression</button>
+    </div>
+    <div class="save-zone" id="save-zone">
+      <div class="save-zone-title">💾 Sauvegarde</div>
+      <div class="save-btns">
+        <button class="save-btn export" onclick="exportSave()">
+          <span class="save-btn-ico">📤</span>
+          <span class="save-btn-lbl">Exporter</span>
+        </button>
+        <button class="save-btn import" onclick="triggerImport()">
+          <span class="save-btn-ico">📥</span>
+          <span class="save-btn-lbl">Importer</span>
+        </button>
+      </div>
+      <div class="save-info">Exporte un fichier <code style="color:var(--blue);font-family:'JetBrains Mono',monospace">.json</code> pour sauvegarder ta progression, ou importe une sauvegarde existante.</div>
+    </div>
+  `;
+  setTimeout(()=>{const f=document.getElementById('sh-xpf');if(f)f.style.width=(xpIn/XPL*100)+'%';},200);
+  goScreen('s-stats');
+}
+
+/* ==========================================================
+   FICHES SCREEN
+========================================================== */
+function showFiches(){
+  sndClick();
+  const body = document.getElementById('fiche-body');
+  const theories = [];
+  CUR.forEach(L=>{
+    L.steps.forEach(s=>{
+      if(s.k==='theory') theories.push({...s,lesson:L.title,icon:L.icon,nodeColor:L.nodeColor,done:G.completed.includes(L.id)});
+    });
+  });
+  if(theories.length===0){
+    body.innerHTML=`<div class="fiche-empty"><span class="fiche-empty-ico">📖</span><div class="fiche-empty-txt">Complète des leçons pour débloquer les fiches de révision !</div></div>`;
+  } else {
+    body.innerHTML = theories.map((t,i)=>`
+      <div class="fiche-card" onclick="openFiche(${i})" data-fi="${i}">
+        <div class="fiche-card-hd">
+          <span class="fiche-card-ico">${t.ico||t.icon}</span>
+          <div>
+            <div class="fiche-card-title">${t.title}</div>
+            <div class="fiche-card-sub" style="color:${t.nodeColor}">${t.lesson}</div>
+          </div>
+        </div>
+        <div class="fiche-preview">${t.html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().slice(0,120)}…</div>
+      </div>
+    `).join('');
+    // store for fiche viewer
+    window._fiches = theories;
+  }
+  goScreen('s-fiches');
+}
+
+function closeFiche(){
+  const overlay = document.querySelector('.fiche-overlay');
+  if(overlay){ sndClick(); overlay.remove(); }
+}
+
+function openFiche(i){
+  // prevent stacking
+  document.querySelectorAll('.fiche-overlay').forEach(o=>o.remove());
+  const t = window._fiches[i];
+  if(!t)return;
+  const fcard = document.createElement('div');
+  fcard.className = 'fiche-overlay';
+  fcard.style.cssText='position:fixed;inset:0;z-index:600;background:var(--bg);overflow-y:auto;padding:20px 18px 60px;';
+  fcard.innerHTML=`
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+      <button id="fiche-close-btn" style="width:36px;height:36px;border:1px solid var(--bdr2);background:var(--surf2);color:var(--muted2);border-radius:8px;cursor:pointer;font-size:.95rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✕</button>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;">${t.title}</div>
+    </div>
+    <div class="tcard">
+      <div class="thd"><div class="tico">${t.ico||t.icon}</div><div><div class="tttl">${t.title}</div><div class="tsub" style="color:${t.nodeColor}">${t.lesson}</div></div></div>
+      <div class="tbd">${t.html}</div>
+    </div>
+  `;
+  document.body.appendChild(fcard);
+  fcard.querySelector('#fiche-close-btn').addEventListener('click', closeFiche);
+  sndClick();
+  // init tabs inside fiche
+  fcard.querySelectorAll('.tab').forEach(tab=>{
+    tab.addEventListener('click',()=>{
+      const pid=tab.dataset.pan;const scope=tab.closest('.tbd');
+      scope.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+      scope.querySelectorAll('.tabpan').forEach(x=>x.classList.remove('on'));
+      tab.classList.add('on');const pan=scope.querySelector('#'+pid);if(pan)pan.classList.add('on');
+    });
+  });
+}
+
+/* ==========================================================
+   EXPORT / IMPORT SAVE
+========================================================== */
+// Hidden file input — created once
+const _importInput = document.createElement('input');
+_importInput.type = 'file';
+_importInput.accept = '.json,application/json';
+_importInput.style.display = 'none';
+document.body.appendChild(_importInput);
+
+function exportSave(){
+  sndClick();
+  const data = {
+    _version: 1,
+    _app: 'physingo',
+    _date: new Date().toISOString(),
+    xp: G.xp,
+    streak: G.streak,
+    level: G.level,
+    completed: G.completed,
+    soundOn: G.soundOn,
+    dailyStreak: G.dailyStreak,
+    lastPlayDate: G.lastPlayDate,
+    todayDone: G.todayDone,
+    totalCorrect: G.totalCorrect,
+    totalAnswers: G.totalAnswers
+  };
+  const json   = JSON.stringify(data, null, 2);
+  const blob   = new Blob([json], {type: 'application/json'});
+  const url    = URL.createObjectURL(blob);
+  const date   = new Date().toISOString().slice(0,10);
+  const a      = document.createElement('a');
+  a.href       = url;
+  a.download   = `physingo-save-${date}.json`;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 1000);
+  showToast('📤 Sauvegarde exportée !');
+}
+
+function triggerImport(){
+  sndClick();
+  _importInput.value = '';           // reset so same file can be re-selected
+  _importInput.click();
+}
+
+_importInput.addEventListener('change', ()=>{
+  const file = _importInput.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const d = JSON.parse(e.target.result);
+      // Basic validation
+      if(d._app !== 'physingo') throw new Error('Fichier invalide');
+      // Apply data
+      if(d.xp          != null) G.xp           = d.xp;
+      if(d.streak      != null) G.streak        = d.streak;
+      if(d.level       != null) G.level         = d.level;
+      if(d.completed)           G.completed     = d.completed;
+      if(d.soundOn     != null) G.soundOn       = d.soundOn;
+      if(d.dailyStreak != null) G.dailyStreak   = d.dailyStreak;
+      if(d.lastPlayDate)        G.lastPlayDate  = d.lastPlayDate;
+      if(d.todayDone   != null) G.todayDone     = d.todayDone;
+      if(d.totalCorrect!= null) G.totalCorrect  = d.totalCorrect;
+      if(d.totalAnswers!= null) G.totalAnswers  = d.totalAnswers;
+      saveState();
+      syncNav();
+      // Flash the save zone and refresh stats
+      const sz = document.getElementById('save-zone');
+      if(sz){ sz.classList.remove('imported'); void sz.offsetHeight; sz.classList.add('imported'); }
+      showToast('✅ Sauvegarde importée !');
+      sndLevelUp();
+      // Refresh stats screen
+      setTimeout(()=>showStats(), 350);
+    } catch(err) {
+      showToast('❌ Fichier invalide ou corrompu');
+    }
+  };
+  reader.onerror = ()=> showToast('❌ Erreur de lecture du fichier');
+  reader.readAsText(file);
+});
+function confirmReset(){
+  G.xp=0;G.streak=0;G.level=1;G.completed=[];G.dailyStreak=0;G.lastPlayDate='';G.todayDone=false;
+  G.totalCorrect=0;G.totalAnswers=0;
+  saveState();
+  document.getElementById('reset-modal').classList.remove('open');
+  showToast('🗑️ Progression réinitialisée');
+  setTimeout(()=>{showStats();},300);
+}
+
+/* ==========================================================
+   SWIPE GESTURE (go back)
+========================================================== */
+(()=>{
+  let sx=0,sy=0;
+  document.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;},{passive:true});
+  document.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-sx;
+    const dy=Math.abs(e.changedTouches[0].clientY-sy);
+    if(dx>60&&dy<40){
+      // close fiche overlay first if open
+      if(document.querySelector('.fiche-overlay')){closeFiche();return;}
+      const scr=document.querySelector('.scr.active');
+      if(scr&&scr.id!=='s-home'&&scr.id!=='s-lesson'){sndClick();goHome();}
+      if(scr&&scr.id==='s-lesson'){quitLesson();}
+    }
+  },{passive:true});
+})();
+
+
 
 function syncDailyStreak(){
   const fires=document.getElementById('ds-fires');
@@ -1642,9 +2163,9 @@ function buildPath(){
   const wrap = document.getElementById('path');
   wrap.innerHTML = '';
 
-  const NODE  = 76;
+  const NODE  = window.innerWidth >= 600 ? 90 : 76;
   const HALF  = NODE / 2;
-  const ROW_H = 130;
+  const ROW_H = window.innerWidth >= 600 ? 150 : 130;
   const PAD_T = 20;
   const LBL_H = 28; // space for label below node
   const n     = CUR.length;
@@ -1655,7 +2176,9 @@ function buildPath(){
   const totalH = (n - 1) * ROW_H + NODE + PAD_T + LBL_H + 16;
   wrap.style.height = totalH + 'px';
 
-  const W = wrap.getBoundingClientRect().width || wrap.offsetWidth || 320;
+  // Use requestAnimationFrame to ensure element is laid out
+  const doLayout = () => {
+  const W = wrap.getBoundingClientRect().width || wrap.offsetWidth || (window.innerWidth >= 600 ? 580 : 320);
 
   const pts = CUR.map((_, i) => ({
     x: XFRAC[i % XFRAC.length] * W,
@@ -1823,6 +2346,11 @@ function buildPath(){
     nw.appendChild(card);
     wrap.appendChild(nw);
   });
+  // re-apply active filter visually
+  if(G.activeFilter) setFilter(G.activeFilter, true);
+  }; // end doLayout
+  if(wrap.getBoundingClientRect().width > 0) doLayout();
+  else requestAnimationFrame(doLayout);
 }
 
 function toggleCard(i){
@@ -1871,6 +2399,7 @@ function startQuickLesson(lessonIdx){
   G.quickTimeLeft=QUICK_DURATION;
   // pick random quiz steps (no theory), max 4
   const allQ=CUR[lessonIdx].steps.map((s,i)=>({...s,_orig:i})).filter(s=>s.k!=='theory');
+  if(allQ.length===0){showToast('❌ Aucune question dans cette leçon');return;}
   const picked=shuffle([...allQ]).slice(0,Math.min(4,allQ.length));
   G.quickSteps=picked;
   G.si=0;G.correct=0;G.wrong=0;G.answered=false;G.lives=5;
@@ -2123,6 +2652,12 @@ function toggleHint(btn,hint){
    KEYBOARD SHORTCUTS
 ========================================================== */
 document.addEventListener('keydown',e=>{
+  // Escape closes fiche overlay first
+  if(e.key==='Escape'){
+    if(document.querySelector('.fiche-overlay')){closeFiche();return;}
+    if(document.getElementById('quit-modal').classList.contains('open')){cancelQuit();return;}
+    if(document.getElementById('reset-modal').classList.contains('open')){document.getElementById('reset-modal').classList.remove('open');return;}
+  }
   const s=document.querySelector('.scr.active');
   if(!s)return;
   if(s.id==='s-lesson'){
@@ -2190,12 +2725,12 @@ function checkAns(){
     fb.innerHTML=`<div class="fb-ttl">${ok?'✓ Correct !':'✗ Pas tout à fait…'}</div><div class="fb-bd">${step.expl}</div>`;}
 
   if(ok){
-    G.correct++;const xp=10+G.streak*2;G.xp+=xp;G.streak++;
+    G.correct++;G.totalCorrect++;G.totalAnswers++;const xp=10+G.streak*2;G.xp+=xp;G.streak++;
     sndCorrect();
     fx(['⭐','✨','💫','🌟']);fxXP('+'+xp+' XP');
     if(G.streak>0&&G.streak%3===0)showToast('🔥 Série de '+G.streak+' !');
   } else {
-    G.wrong++;G.streak=0;G.lives=Math.max(0,G.lives-1);
+    G.wrong++;G.totalAnswers++;G.streak=0;G.lives=Math.max(0,G.lives-1);
     sndWrong();
     document.querySelectorAll('.ht')[G.lives]?.classList.add('gone');
   }
@@ -2307,6 +2842,10 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=~~(Math.random()*(i+1)
 /* BOOT */
 loadState();
 buildPath();syncNav();syncDailyStreak();
+// init filter: show "Tout" as selected
+document.getElementById('fc-all').classList.add('on');
+// handle resize (tablet rotation)
+window.addEventListener('resize',()=>{if(document.querySelector('.scr.active')?.id==='s-home')buildPath();});
 </script>
 </body>
 </html>
