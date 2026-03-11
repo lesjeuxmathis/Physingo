@@ -17,6 +17,7 @@
   --radius:18px;--radius-sm:12px;--radius-xs:8px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{background:var(--bg);}
 html,body{height:100%;overflow:hidden;}
 
 body{
@@ -195,7 +196,7 @@ body::before{
 }
 .ncard-btn:active{transform:translateY(2px);}
 
-.ov{position:fixed;inset:0;z-index:200;display:none;}
+.ov{position:absolute;inset:0;z-index:200;display:none;}
 .ov.on{display:block;}
 
 /* QUIT MODAL */
@@ -709,8 +710,6 @@ body::before{
 </head>
 <body>
 
-<div class="ov" id="ov" onclick="closeCards()"></div>
-
 <!-- QUIT MODAL -->
 <div class="modal-bg" id="quit-modal">
   <div class="modal">
@@ -762,6 +761,7 @@ body::before{
     </button>
     <div class="path" id="path"></div>
   </div>
+  <div class="ov" id="ov" onclick="closeCards()"></div>
 </div>
 
 <!-- INTRO -->
@@ -865,6 +865,127 @@ body::before{
    CURRICULUM DATA
 ========================================================== */
 const CUR = [
+  {id:'c1',icon:'🏃',color:'#39d353',nodeColor:'#39d353',title:'La Vitesse',sub:'Distance, temps, vitesse : les bases du mouvement.',level:'🟢 Collège',steps:[
+    {k:'theory',ico:'📖',title:'Qu\'est-ce que la vitesse ?',sub:'Comprendre le concept',
+      html:`<p>La vitesse mesure à quel point un objet se déplace <strong>vite</strong>. Elle dépend de la <strong>distance</strong> parcourue et du <strong>temps</strong> mis.</p>
+      <div class="fbox"><div class="fmain">v = d / t</div><div class="fleg"><div class="fi"><b>v</b> vitesse (m/s)</div><div class="fi"><b>d</b> distance (m)</div><div class="fi"><b>t</b> temps (s)</div></div></div>
+      <div class="tip"><div class="tiico">🚗</div><div class="titxt"><strong>Exemple :</strong> 100 km en 2 h → v = 100 ÷ 2 = <strong>50 km/h</strong>. Simple !</div></div>
+      <p>En physique on utilise les <strong>m/s</strong>. Conversion : 1 m/s = 3,6 km/h.</p>`},
+    {k:'theory',ico:'🔄',title:'Les formules dérivées',sub:'Trouver d ou t depuis v',
+      html:`<p>À partir de <strong>v = d / t</strong>, on isole chaque variable :</p>
+      <div class="fbox"><div class="fmain">d = v × t</div></div>
+      <div class="fbox"><div class="fmain">t = d / v</div></div>
+      <div class="tip"><div class="tiico">💡</div><div class="titxt"><strong>Triangle :</strong> d en haut, v et t en bas. Cache ce que tu cherches → les deux autres donnent l'opération !</div></div>
+      <div class="tabs"><button class="tab on" data-pan="te1">Exemple</button><button class="tab" data-pan="te2">Unités</button></div>
+      <div class="tabpan on" id="te1">Cycliste à 5 m/s pendant 10 s → d = 5 × 10 = <strong>50 m</strong>.</div>
+      <div class="tabpan" id="te2">SI : m/s, m, s.<br>Courant : km/h, km, h.<br>⚠️ Attention aux conversions !</div>`},
+    {k:'mcq',q:'Quelle est la formule correcte de la vitesse ?',hint:'v, d et t sont les symboles classiques.',
+      opts:['v = d × t','v = t / d','v = d / t','v = d + t'],ans:2,
+      expl:'<code>v = d / t</code> : distance divisée par temps. Plus la distance est grande ou le temps court, plus v est élevée.'},
+    {k:'fill',q:'Un train parcourt 300 m en 15 s. Sa vitesse est ___ m/s.',ph:'ex: 20',
+      ans:'20',acc:['20'],hint:'v = d / t = 300 / 15',
+      expl:'v = 300 ÷ 15 = <code>20 m/s</code> ✓'},
+    {k:'word',q:'Reconstitue la formule de la distance :',words:['d','=','v','×','t'],ans:'d = v × t',
+      expl:'Distance = vitesse × temps. Si v = 10 m/s et t = 5 s → d = 50 m.'},
+    {k:'mcq',q:'Un coureur fait 100 m en 10 s. Quelle est sa vitesse ?',
+      opts:['1 m/s','10 m/s','100 m/s','1000 m/s'],ans:1,
+      expl:'v = 100 ÷ 10 = <code>10 m/s</code> = 36 km/h. Niveau d\'un sprinter olympique !'},
+    {k:'mcq',q:'v = 72 km/h en m/s donne :',opts:['72 m/s','20 m/s','7,2 m/s','200 m/s'],ans:1,expl:'72 ÷ 3,6 = <strong>20 m/s</strong>. La conversion km/h → m/s se fait en divisant par 3,6.'},
+    {k:'fill',q:'d = 500 m, t = 25 s. v = ___ m/s.',ans:'20',acc:['20'],ph:'ex: 20',hint:'v = d / t = 500 / 25',expl:'v = 500 / 25 = <code>20 m/s</code>.'},
+    {k:'mcq',q:'Un objet met 5 s pour parcourir 100 m. Sa vitesse est :',opts:['500 m/s','20 m/s','0,05 m/s','50 m/s'],ans:1,expl:'v = 100 / 5 = <strong>20 m/s</strong>.'},
+    {k:'fill',q:'v = 15 m/s, t = 8 s. Distance d = ___ m.',ans:'120',acc:['120'],ph:'ex: 120',hint:'d = v × t = 15 × 8',expl:'d = 15 × 8 = <code>120 m</code>.'},
+    {k:'mcq',q:'1 m/s est égal à :',opts:['1 km/h','3,6 km/h','0,36 km/h','36 km/h'],ans:1,expl:'1 m/s × 3,6 = <strong>3,6 km/h</strong>. Pour convertir m/s en km/h, on multiplie par 3,6.'},
+    {k:'fill',q:'v = 90 km/h, t = 2 h. d = ___ km.',ans:'180',acc:['180'],ph:'ex: 180',hint:'d = v × t = 90 × 2',expl:'d = 90 × 2 = <code>180 km</code>.'},
+    {k:'pairs',q:'Associe grandeur et unité SI :',pairs:[['Vitesse','m/s'],['Distance','m'],['Temps','s'],['Accélération','m/s²']],expl:'Les unités SI sont indispensables pour les calculs de physique.'},
+    {k:'mcq',q:'d = 240 m, v = 8 m/s. Le temps t est :',opts:['30 s','1920 s','3 s','48 s'],ans:0,expl:'t = d / v = 240 / 8 = <strong>30 s</strong>.'},
+    {k:'fill',q:'Un avion vole à 900 km/h. En m/s, c\'est ___ m/s.',ans:'250',acc:['250'],ph:'ex: 250',hint:'900 / 3,6',expl:'900 / 3,6 = <code>250 m/s</code>.'},
+    {k:'word',q:'Reconstitue la formule du temps :',ans:'t = d / v',words:['t','=','d','/','v'],expl:'On isole t dans v = d/t → t = d/v. Ex : 60 m à 12 m/s → t = 5 s.'},
+    {k:'mcq',q:'Vitesse moyenne = 50 km/h sur 3 h. Distance parcourue :',opts:['53 km','150 km','47 km','16,7 km'],ans:1,expl:'d = 50 × 3 = <strong>150 km</strong>.'},
+    {k:'fill',q:'t = 120 s, d = 600 m. v = ___ m/s.',ans:'5',acc:['5'],ph:'ex: 5',hint:'v = d/t = 600/120',expl:'v = 600 / 120 = <code>5 m/s</code>.'}]},
+  {id:'c2',icon:'⚖️',color:'#39d353',nodeColor:'#39d353',title:'Poids & Masse',sub:'Une distinction fondamentale souvent confondue.',level:'🟢 Collège',steps:[
+    {k:'theory',ico:'🌍',title:'Masse vs Poids',sub:'Ne plus jamais les confondre',
+      html:`<p>La <strong>masse</strong> (m, kg) = quantité de matière — <strong>identique partout dans l'univers</strong>.</p>
+      <p>Le <strong>poids</strong> (P, N) = force gravitationnelle — varie selon la planète.</p>
+      <div class="fbox"><div class="fmain">P = m × g</div><div class="fleg"><div class="fi"><b>P</b> poids (N)</div><div class="fi"><b>m</b> masse (kg)</div><div class="fi"><b>g</b> pesanteur (N/kg)</div></div></div>
+      <div class="tip"><div class="tiico">🚀</div><div class="titxt">Sur la <strong>Lune</strong>, g ≈ 1,6 N/kg. Un astronaute de 80 kg pèse 784 N sur Terre mais seulement 128 N sur la Lune. Sa <strong>masse reste 80 kg</strong> !</div></div>`},
+    {k:'mcq',q:'Masse = 5 kg, g = 10 N/kg. Quel est le poids ?',
+      opts:['5 N','2 N','50 N','500 N'],ans:2,
+      expl:'P = 5 × 10 = <code>50 N</code>. Le Newton est l\'unité de force.'},
+    {k:'fill',q:'Sur Mars (g = 3,7 N/kg), le poids d\'un rover de 900 kg est ___ N.',ph:'ex: 3330',
+      ans:'3330',acc:['3330','3 330'],hint:'P = 900 × 3,7',
+      expl:'P = 900 × 3,7 = <code>3 330 N</code>, bien moins que 8 820 N sur Terre !'},
+    {k:'pairs',q:'Associe chaque grandeur à son unité :',
+      pairs:[['Masse','kg'],['Poids','N'],['g Terre','9,8 N/kg'],['g Lune','1,6 N/kg']],
+      expl:'Masse → kg, Poids → N. Cette distinction est fondamentale en physique !'},
+    {k:'mcq',q:'Sur la Lune (g = 1,6 N/kg), un objet de 10 kg pèse :',opts:['10 N','16 N','98 N','160 N'],ans:1,expl:'P = 10 × 1,6 = <strong>16 N</strong>. La masse reste 10 kg !'},
+    {k:'fill',q:'P = 490 N, g = 9,8 N/kg. Masse m = ___ kg.',ans:'50',acc:['50'],ph:'ex: 50',hint:'m = P / g = 490 / 9,8',expl:'m = 490 / 9,8 = <code>50 kg</code>.'},
+    {k:'mcq',q:'La masse d\'un objet :',opts:['Change selon la planète','Est toujours la même partout','Augmente en altitude','Dépend de g'],ans:1,expl:'La <strong>masse</strong> est invariante, elle ne dépend pas de la planète. Seul le poids change.'},
+    {k:'fill',q:'m = 60 kg, g = 9,8 N/kg. P = ___ N.',ans:'588',acc:['588'],ph:'ex: 588',hint:'P = m × g = 60 × 9,8',expl:'P = 60 × 9,8 = <code>588 N</code>.'},
+    {k:'pairs',q:'Associe chaque grandeur à son instrument de mesure :',pairs:[['Masse','Balance'],['Poids','Dynamomètre'],['g Terre','9,8 N/kg'],['Poids Lune','m × 1,6']],expl:'La balance mesure la masse (en kg), le dynamomètre mesure une force (en N).'},
+    {k:'mcq',q:'Le poids est une :',opts:['Quantité de matière','Force gravitationnelle','Propriété intrinsèque','Unité de mesure'],ans:1,expl:'Le poids est une <strong>force</strong> (en Newton), due à l\'attraction gravitationnelle de la planète.'},
+    {k:'fill',q:'Sur Mars (g=3,7 N/kg), masse = 50 kg. Poids = ___ N.',ans:'185',acc:['185'],ph:'ex: 185',hint:'P = 50 × 3,7',expl:'P = 50 × 3,7 = <code>185 N</code>.'},
+    {k:'mcq',q:'Un objet pèse 100 N sur Terre (g=10). Sa masse est :',opts:['100 kg','1000 kg','10 kg','0,1 kg'],ans:2,expl:'m = P/g = 100/10 = <strong>10 kg</strong>.'},
+    {k:'fill',q:'g Jupiter = 25 N/kg. Poids d\'un rover de 200 kg = ___ N.',ans:'5000',acc:['5000'],ph:'ex: 5000',hint:'P = 200 × 25',expl:'P = 200 × 25 = <code>5 000 N</code>, soit 5× plus que sur Terre !'},
+    {k:'word',q:'Reconstitue la formule du poids :',ans:'P = m × g',words:['P','=','m','×','g'],expl:'Poids = masse × intensité de pesanteur. Ex : 70 kg × 9,8 = 686 N sur Terre.'},
+    {k:'mcq',q:'Unité de la force poids :',opts:['kg','m/s','N','J'],ans:2,expl:'Le poids est une force, son unité SI est le <strong>Newton (N)</strong>.'},
+    {k:'mcq',q:'g Saturne = 10,4 N/kg. Un objet de 5 kg pèse :',opts:['5 N','10,4 N','52 N','2 N'],ans:2,expl:'P = 5 × 10,4 = <strong>52 N</strong>.'}]},
+  {id:'l1',icon:'⚡',color:'#38bdf8',nodeColor:'#38bdf8',title:'Loi d\'Ohm',sub:'Tension, intensité, résistance : le trio de l\'électricité.',level:'🔵 Lycée',steps:[
+    {k:'theory',ico:'🔌',title:'La loi d\'Ohm',sub:'Le pilier de l\'électricité',
+      html:`<p>Dans un conducteur ohmique, les trois grandeurs électriques sont liées :</p>
+      <div class="fbox"><div class="fmain">U = R × I</div><div class="fleg"><div class="fi"><b>U</b> tension (V)</div><div class="fi"><b>R</b> résistance (Ω)</div><div class="fi"><b>I</b> intensité (A)</div></div></div>
+      <div class="tip"><div class="tiico">💧</div><div class="titxt"><strong>Analogie eau :</strong> U = pression, I = débit, R = taille du tuyau. Plus le tuyau est étroit (R ↑), moins l'eau passe (I ↓).</div></div>
+      <div class="tabs"><button class="tab on" data-pan="to1">Formules dérivées</button><button class="tab" data-pan="to2">Histoire</button></div>
+      <div class="tabpan on" id="to1"><strong>I = U / R</strong> pour trouver l'intensité<br><strong>R = U / I</strong> pour trouver la résistance</div>
+      <div class="tabpan" id="to2">Georg Ohm (1789-1854) découvrit cette loi en 1827. Elle fut d'abord rejetée… avant de devenir incontournable !</div>`},
+    {k:'mcq',q:'R = 100 Ω, I = 0,5 A. Quelle est la tension U ?',
+      opts:['200 V','50 V','0,005 V','150 V'],ans:1,
+      expl:'U = R × I = 100 × 0,5 = <code>50 V</code>.'},
+    {k:'word',q:'Isole R dans la loi d\'Ohm :',words:['R','=','U','/','I'],ans:'R = U / I',
+      expl:'On divise U par I pour obtenir R. Ex : 12 V, 2 A → R = 6 Ω.'},
+    {k:'fill',q:'Si U = 230 V et R = 1150 Ω, l\'intensité I = ___ A.',ph:'ex: 0.2',
+      ans:'0.2',acc:['0.2','0,2','0.20','0,20'],hint:'I = U / R = 230 / 1150',
+      expl:'I = 230 / 1150 = <code>0,2 A</code> — courant typique d\'une LED.'},
+    {k:'mcq',q:'À tension U fixe, doubler R provoque :',
+      opts:['U double','I double','I est divisé par 2','R ne change rien'],ans:2,
+      expl:'I = U / R. Si R × 2, alors I ÷ 2. La résistance freine le courant !'},
+    {k:'fill',q:'U = 12 V, R = 6 Ω. Intensité I = ___ A.',ans:'2',acc:['2','2.0'],ph:'ex: 2',hint:'I = U / R = 12 / 6',expl:'I = 12 / 6 = <code>2 A</code>.'},
+    {k:'fill',q:'I = 3 A, R = 15 Ω. Tension U = ___ V.',ans:'45',acc:['45'],ph:'ex: 45',hint:'U = R × I = 15 × 3',expl:'U = 15 × 3 = <code>45 V</code>.'},
+    {k:'mcq',q:'U = 9 V, I = 0,3 A. Résistance R = :',opts:['2,7 Ω','30 Ω','0,03 Ω','3 Ω'],ans:1,expl:'R = U/I = 9/0,3 = <strong>30 Ω</strong>.'},
+    {k:'pairs',q:'Associe grandeur et unité SI :',pairs:[['Tension','Volt (V)'],['Intensité','Ampère (A)'],['Résistance','Ohm (Ω)'],['Puissance','Watt (W)']],expl:'U en V, I en A, R en Ω : le trio de la loi d\'Ohm.'},
+    {k:'fill',q:'R = 220 Ω, U = 11 V. I = ___ A.',ans:'0.05',acc:['0.05','0,05','5e-2'],ph:'ex: 0.05',hint:'I = U/R = 11/220',expl:'I = 11/220 = <code>0,05 A</code> = 50 mA.'},
+    {k:'mcq',q:'Doubler l\'intensité à résistance fixe :',opts:['Divise la tension par 2','Double la tension','Ne change pas la tension','Double la résistance'],ans:1,expl:'U = R × I. Si I × 2, alors U × 2. La tension est proportionnelle à l\'intensité.'},
+    {k:'fill',q:'R_série = R1 + R2. R1=100Ω, R2=150Ω. R_total = ___ Ω.',ans:'250',acc:['250'],ph:'ex: 250',hint:'100 + 150',expl:'En série : R_total = 100 + 150 = <code>250 Ω</code>.'},
+    {k:'mcq',q:'Un conducteur ohmique vérifie :',opts:['U = R / I','U = R × I','R = U × I','I = U × R'],ans:1,expl:'La loi d\'Ohm : <strong>U = R × I</strong>. Georg Ohm la découvrit en 1827.'},
+    {k:'fill',q:'U = 5 V, I = 25 mA = 0,025 A. R = ___ Ω.',ans:'200',acc:['200'],ph:'ex: 200',hint:'R = U/I = 5/0,025',expl:'R = 5/0,025 = <code>200 Ω</code>.'},
+    {k:'mcq',q:'En parallèle, la tension aux bornes de chaque résistance est :',opts:['Divisée par n','La même pour toutes','La somme des tensions','Nulle'],ans:1,expl:'En <strong>parallèle</strong>, la tension est identique pour chaque branche.'},
+    {k:'fill',q:'R = 470 Ω, I = 10 mA = 0,01 A. U = ___ V.',ans:'4.7',acc:['4.7','4,7'],ph:'ex: 4.7',hint:'U = R × I = 470 × 0,01',expl:'U = 470 × 0,01 = <code>4,7 V</code>.'},
+    {k:'word',q:'Isole I dans la loi d\'Ohm :',ans:'I = U / R',words:['I','=','U','/','R'],expl:'On divise U par R. Ex : 12 V, 4 Ω → I = 3 A.'}]},
+  {id:'l2',icon:'🌡️',color:'#38bdf8',nodeColor:'#38bdf8',title:'Gaz Parfaits',sub:'PV = nRT : la loi fondamentale des gaz.',level:'🔵 Lycée',steps:[
+    {k:'theory',ico:'🔬',title:'La loi des gaz parfaits',sub:'Pression, volume, température',
+      html:`<p>Un gaz parfait est un modèle simplifié (molécules sans interactions) :</p>
+      <div class="fbox"><div class="fmain">PV = nRT</div><div class="fleg"><div class="fi"><b>P</b> pression (Pa)</div><div class="fi"><b>V</b> volume (m³)</div><div class="fi"><b>n</b> quantité (mol)</div><div class="fi"><b>R</b> 8,314 J/(mol·K)</div><div class="fi"><b>T</b> température (K)</div></div></div>
+      <div class="tip"><div class="tiico">⚠️</div><div class="titxt"><strong>ATTENTION :</strong> T doit être en <strong>Kelvin</strong> ! Conversion : T(K) = θ(°C) + 273.<br>0°C = 273 K · 100°C = 373 K</div></div>`},
+    {k:'mcq',q:'0°C correspond à combien de Kelvin ?',
+      opts:['0 K','100 K','273 K','373 K'],ans:2,
+      expl:'T(K) = 0 + 273 = <code>273 K</code>. Le zéro absolu (0 K) est la température minimale possible.'},
+    {k:'fill',q:'1 mol, T = 300 K, V = 0,025 m³. P ≈ ___ Pa.',ph:'ex: 99768',
+      ans:'99768',acc:['99768','99767','99770','100000','99769'],hint:'P = nRT/V = 1×8,314×300÷0,025',
+      expl:'P ≈ <code>99 768 Pa</code> ≈ 1 atmosphère !'},
+    {k:'pairs',q:'Associe variable et unité SI :',
+      pairs:[['P','Pascal (Pa)'],['V','Mètre cube (m³)'],['T','Kelvin (K)'],['n','Mole (mol)']],
+      expl:'Ces unités sont indispensables dans PV = nRT !'},
+    {k:'fill',q:'n=2 mol, R=8,314, T=300 K, V=0,05 m³. P = ___ Pa.',ans:'99768',acc:['99768','99767','99769','99770'],ph:'ex: 99768',hint:'P = nRT/V = 2×8,314×300/0,05',expl:'P = 2×8,314×300/0,05 = <code>99 768 Pa</code>.'},
+    {k:'mcq',q:'100°C correspond à :',opts:['100 K','173 K','373 K','273 K'],ans:2,expl:'T(K) = 100 + 273 = <strong>373 K</strong>. C\'est la température d\'ébullition de l\'eau.'},
+    {k:'mcq',q:'Si T double (à n,V constants), la pression :',opts:['Reste constante','Double','Quadruple','Divise par 2'],ans:1,expl:'PV = nRT → P ∝ T. Si T × 2, alors <strong>P × 2</strong>.'},
+    {k:'fill',q:'T = 27°C = ___ K.',ans:'300',acc:['300'],ph:'ex: 300',hint:'T(K) = 27 + 273',expl:'T = 27 + 273 = <code>300 K</code>.'},
+    {k:'mcq',q:'R (constante des gaz parfaits) vaut :',opts:['8,314 J/(mol·K)','6,022 J/(mol·K)','1,38 J/(mol·K)','9,8 J/(mol·K)'],ans:0,expl:'R = <strong>8,314 J/(mol·K)</strong>. C\'est la constante des gaz parfaits.'},
+    {k:'fill',q:'P=101325 Pa, n=1 mol, T=273 K. V ≈ ___ m³.',ans:'0.0224',acc:['0.0224','0.022','0,0224','0,022'],ph:'ex: 0.0224',hint:'V = nRT/P = 1×8,314×273/101325',expl:'V ≈ <code>0,0224 m³</code> = 22,4 L (volume molaire standard).'},
+    {k:'pairs',q:'Associe loi et relation (à quantité constante) :',pairs:[['Loi de Boyle','PV = cste (T fixe)'],['Loi de Gay-Lussac','P/T = cste (V fixe)'],['Loi de Charles','V/T = cste (P fixe)'],['Gaz parfait','PV = nRT']],expl:'Ces trois lois sont des cas particuliers de PV = nRT.'},
+    {k:'mcq',q:'Le zéro absolu (0 K) correspond à :',opts:['0°C','-100°C','-273°C','-373°C'],ans:2,expl:'0 K = <strong>-273°C</strong>. C\'est la température minimale possible.'},
+    {k:'fill',q:'P=2×101325 Pa, V=0,01 m³, T=300 K. n ≈ ___ mol.',ans:'8.1',acc:['8.1','8,1','8.13','8,13'],ph:'ex: 8.1',hint:'n = PV/(RT)',expl:'n = 2×101325×0,01/(8,314×300) ≈ <code>8,1 mol</code>.'},
+    {k:'mcq',q:'À n et P constants, doubler V revient à :',opts:['Doubler T','Diviser T par 2','Quadrupler T','T ne change pas'],ans:0,expl:'V/T = nR/P = cste → V × 2 implique <strong>T × 2</strong> (loi de Charles).'},
+    {k:'word',q:'Reconstitue l\'équation d\'état :',ans:'P V = n R T',words:['P','V','=','n','R','T'],expl:'PV = nRT : pression × volume = moles × R × température (en K).'},
+    {k:'fill',q:'T = -73°C = ___ K.',ans:'200',acc:['200'],ph:'ex: 200',hint:'-73 + 273',expl:'T = -73 + 273 = <code>200 K</code>.'}]},
   {id:'ch0',icon:'📏',color:'#39d353',nodeColor:'#39d353',title:'Mesures & Incertitudes',sub:'Grandeurs, unités SI et incertitudes de mesure.',level:'🟢 1re',steps:[
     {k:'theory',ico:'📐',title:'Grandeurs et unités SI',sub:'Les bases de la mesure',
       html:`<p>Une <strong>grandeur physique</strong> est une propriété exprimée par un nombre et une unité.</p>
@@ -884,7 +1005,18 @@ const CUR = [
     {k:'pairs',q:'Associe chaque grandeur à son unité SI :',
       pairs:[['Énergie','Joule (J)'],['Puissance','Watt (W)'],['Pression','Pascal (Pa)'],['Fréquence','Hertz (Hz)']],
       expl:'J = kg·m²·s⁻², W = J/s, Pa = N/m², Hz = s⁻¹. Ces unités sont dérivées des 7 unités de base du SI.'},
-  ]},
+    {k:'mcq',q:'Quelle est l\'unité SI de la pression ?',opts:['Bar','Atm','Pascal','Newton'],ans:2,expl:'L\'unité SI de la pression est le <strong>Pascal (Pa)</strong> = N/m².'},
+    {k:'fill',q:'Valeur : m̄ = 10,5 g, u(m) = 0,2 g. Encadrement : ___ g ≤ m ≤ ___ g.',ans:'10.3 - 10.7',acc:['10.3 - 10.7','10,3 - 10,7'],ph:'ex: 10.3 - 10.7',hint:'10,5 - 0,2 et 10,5 + 0,2',expl:'10,5 ± 0,2 → <code>10,3 ≤ m ≤ 10,7 g</code>.'},
+    {k:'pairs',q:'Associe unité à sa grandeur :',pairs:[['Joule (J)','Énergie'],['Newton (N)','Force'],['Pascal (Pa)','Pression'],['Watt (W)','Puissance']],expl:'J = kg·m²·s⁻², N = kg·m·s⁻², Pa = kg·m⁻¹·s⁻², W = J/s.'},
+    {k:'mcq',q:'L\'erreur qui se répète à chaque mesure est :',opts:['Aléatoire','Systématique','Humaine','De répétabilité'],ans:1,expl:'L\'erreur <strong>systématique</strong> est constante et reproductible — elle vient de l\'instrument.'},
+    {k:'mcq',q:'L\'unité SI du temps est :',opts:['Minute','Heure','Seconde','Milliseconde'],ans:2,expl:'L\'unité SI du temps est la <strong>seconde (s)</strong>.'},
+    {k:'fill',q:'1 kg = ___ g.',ans:'1000',acc:['1000'],ph:'ex: 1000',hint:'préfixe kilo = ×1000',expl:'1 kg = <code>1 000 g</code>. Kilo = 10³.'},
+    {k:'mcq',q:'La fidélité d\'une mesure correspond à :',opts:['L\'exactitude du résultat','La reproductibilité','L\'absence d\'unité','La précision de l\'instrument'],ans:1,expl:'La <strong>fidélité</strong> = reproductibilité. Améliorer la fidélité réduit l\'erreur aléatoire.'},
+    {k:'fill',q:'1 nm = ___ m.',ans:'1e-9',acc:['1e-9','0.000000001','10^-9'],ph:'ex: 1e-9',hint:'nano = 10⁻⁹',expl:'1 nm = <code>10⁻⁹ m</code>. Utilisé pour les longueurs d\'onde lumineuses.'},
+    {k:'pairs',q:'Associe préfixe à valeur :',pairs:[['kilo','10³'],['mega','10⁶'],['milli','10⁻³'],['micro','10⁻⁶']],expl:'k=10³, M=10⁶, m=10⁻³, μ=10⁻⁶. Indispensables pour exprimer les grandeurs physiques.'},
+    {k:'mcq',q:'La moyenne de 5 mesures améliore :',opts:['La fidélité','La justesse','L\'erreur systématique','La précision de l\'instrument'],ans:0,expl:'Multiplier les mesures et faire la moyenne réduit l\'erreur aléatoire → améliore la <strong>fidélité</strong>.'},
+    {k:'fill',q:'1 MHz = ___ Hz.',ans:'1000000',acc:['1000000','1e6'],ph:'ex: 1000000',hint:'Méga = 10⁶',expl:'1 MHz = <code>10⁶ Hz</code>. La radio FM émet vers 100 MHz.'},
+    {k:'mcq',q:'Le Watt (W) en unités de base est :',opts:['kg·m·s⁻¹','kg·m²·s⁻³','kg·m²·s⁻²','kg·s⁻¹'],ans:1,expl:'W = J/s = kg·m²·s⁻² / s = <strong>kg·m²·s⁻³</strong>.'}]},
   {id:'ch1',icon:'⚡',color:'#fbbf24',nodeColor:'#fbbf24',title:'L\'Énergie & ses Enjeux',sub:'Formes d\'énergie, sources renouvelables et rendement.',level:'🟢 1re',steps:[
     {k:'theory',ico:'🔋',title:'Formes et sources d\'énergie',sub:'6 formes, renouvelable vs non-renouvelable',
       html:`<p>6 grandes formes d'énergie :</p>
@@ -903,7 +1035,18 @@ const CUR = [
     {k:'mcq',q:'L\'énergie mécanique comprend :',
       opts:['Énergie chimique + thermique','Énergie cinétique + potentielle','Énergie nucléaire + rayonnante','Énergie électrique + chimique'],ans:1,
       expl:'L\'énergie mécanique = <strong>énergie cinétique</strong> (mouvement) + <strong>énergie potentielle</strong> (position/altitude).'},
-  ]},
+    {k:'fill',q:'E_utile = 45 J, E_totale = 300 J. Rendement η = ___ %.',ans:'15',acc:['15'],ph:'ex: 15',hint:'η = 45/300 × 100',expl:'η = 45/300 × 100 = <code>15%</code>.'},
+    {k:'mcq',q:'L\'énergie nucléaire utilise :',opts:['La fusion du pétrole','La fission de l\'uranium','La combustion du charbon','La décomposition du gaz'],ans:1,expl:'Le nucléaire repose sur la <strong>fission de l\'uranium</strong> (ou du plutonium).'},
+    {k:'pairs',q:'Associe source à sa catégorie :',pairs:[['Pétrole','Non renouvelable'],['Éolien','Renouvelable'],['Uranium','Non renouvelable'],['Hydraulique','Renouvelable']],expl:'Renouvelables = inépuisables à l\'échelle humaine. Non renouvelables = stocks finis.'},
+    {k:'mcq',q:'1 kWh en joules vaut :',opts:['1 000 J','3 600 J','3 600 000 J','1 000 000 J'],ans:2,expl:'1 kWh = 1000 W × 3600 s = <strong>3 600 000 J</strong> = 3,6 MJ.'},
+    {k:'fill',q:'E_perdue = E_totale − E_utile. E_tot = 500 J, η = 20%. E_utile = ___ J.',ans:'100',acc:['100'],ph:'ex: 100',hint:'E_utile = 0,20 × 500',expl:'E_utile = 0,20 × 500 = <code>100 J</code>.'},
+    {k:'mcq',q:'L\'énergie cinétique + l\'énergie potentielle forment :',opts:['L\'énergie chimique','L\'énergie mécanique','L\'énergie thermique','L\'énergie nucléaire'],ans:1,expl:'Ec + Ep = <strong>énergie mécanique</strong>.'},
+    {k:'fill',q:'Rendement η = 0,25. E_totale = 800 J. E_perdue = ___ J.',ans:'600',acc:['600'],ph:'ex: 600',hint:'E_utile = 0,25×800=200, E_perdue = 800-200',expl:'E_utile = 200 J → E_perdue = 800 - 200 = <code>600 J</code>.'},
+    {k:'mcq',q:'La biomasse est :',opts:['Une énergie fossile','Une énergie renouvelable','Une énergie nucléaire','Une énergie géothermique'],ans:1,expl:'La <strong>biomasse</strong> (bois, déchets organiques) est renouvelable car les végétaux repoussent.'},
+    {k:'pairs',q:'Associe énergie à sa forme :',pairs:[['Batterie','Chimique'],['Eau chaude','Thermique'],['Lampe allumée','Rayonnante'],['Alternateur','Électrique']],expl:'L\'énergie se convertit d\'une forme à l\'autre — toujours avec des pertes.'},
+    {k:'mcq',q:'Un moteur thermique de rendement 30% reçoit 1000 J. Il produit :',opts:['300 J de travail mécanique','700 J de travail mécanique','1000 J de travail mécanique','30 J de travail mécanique'],ans:0,expl:'E_utile = η × E_tot = 0,30 × 1000 = <strong>300 J</strong>. Le reste part en chaleur.'},
+    {k:'fill',q:'P = 2000 W, t = 3600 s. Énergie E = ___ J.',ans:'7200000',acc:['7200000','7 200 000'],ph:'ex: 7200000',hint:'E = P × t = 2000 × 3600',expl:'E = 2000 × 3600 = <code>7 200 000 J</code> = 2 kWh.'},
+    {k:'mcq',q:'La géothermie exploite :',opts:['La chaleur solaire','La chaleur interne de la Terre','La chaleur des océans','La chaleur nucléaire'],ans:1,expl:'La <strong>géothermie</strong> utilise la chaleur naturelle du sous-sol terrestre.'}]},
   {id:'ch2',icon:'🔥',color:'#f87171',nodeColor:'#f87171',title:'Énergie Chimique',sub:'Triangle du feu, exothermique/endothermique, pouvoir calorifique.',level:'🟢 1re',steps:[
     {k:'theory',ico:'🔺',title:'Triangle du feu et combustion',sub:'Les 3 éléments indispensables',
       html:`<p>Une <strong>combustion</strong> nécessite 3 éléments : combustible + comburant (O₂) + énergie d'activation.</p>
@@ -921,7 +1064,18 @@ const CUR = [
     {k:'fill',q:'PC = 50 000 J/kg. Brûler 2 kg libère ___ J.',ph:'ex: 100000',
       ans:'100000',acc:['100000','100 000'],hint:'E = PC × masse = 50000 × 2',
       expl:'E = 50 000 × 2 = <code>100 000 J</code>.'},
-  ]},
+    {k:'fill',q:'PC = 40 000 J/kg, m = 3 kg. Énergie E = ___ J.',ans:'120000',acc:['120000','120 000'],ph:'ex: 120000',hint:'E = PC × m = 40000 × 3',expl:'E = 40 000 × 3 = <code>120 000 J</code>.'},
+    {k:'mcq',q:'La combustion incomplète produit :',opts:['CO₂ + H₂O uniquement','CO + suies + H₂O','H₂ + CO₂','O₂ + H₂O'],ans:1,expl:'Combustion incomplète (manque O₂) → <strong>CO + suies + H₂O</strong>. Le CO est toxique !'},
+    {k:'pairs',q:'Associe réaction à son type :',pairs:[['Combustion','Exothermique'],['Fusion glace','Endothermique'],['Photosynthèse','Endothermique'],['Explosion','Exothermique']],expl:'Exothermique = libère chaleur. Endothermique = absorbe chaleur.'},
+    {k:'fill',q:'CH₄ + 2O₂ → CO₂ + 2H₂O. Combustion ___ du méthane.',ans:'complete',acc:['complete','complète','completé'],ph:'ex: complete',hint:'Produits : CO₂ + H₂O uniquement',expl:'CO₂ + H₂O seulement → combustion <code>complète</code>.'},
+    {k:'mcq',q:'Pour éteindre un feu, on peut :',opts:['Ajouter du combustible','Retirer l\'oxygène','Augmenter la température','Ajouter de l\'azote gazeux chaud'],ans:1,expl:'Retirer l\'O₂ (côté comburant du triangle) éteint le feu — principe de l\'extincteur CO₂.'},
+    {k:'fill',q:'PC charbon = 29 000 J/g. Brûler 500 g libère ___ kJ.',ans:'14500',acc:['14500','14 500'],ph:'ex: 14500',hint:'E = 29000 × 500 = ... J → en kJ divisé par 1000',expl:'E = 29 000 × 500 = 14 500 000 J = <code>14 500 kJ</code>.'},
+    {k:'mcq',q:'La dissolution du sel dans l\'eau est :',opts:['Toujours exothermique','Toujours endothermique','Légèrement endothermique','Explosive'],ans:2,expl:'La dissolution du NaCl absorbe très légèrement de la chaleur → <strong>endothermique</strong>.'},
+    {k:'pairs',q:'Associe combustible à son produit de combustion complète :',pairs:[['C','CO₂'],['H₂','H₂O'],['CH₄','CO₂ + H₂O'],['S','SO₂']],expl:'Soufre → SO₂ (pluies acides). Hydrocarbures → CO₂ + H₂O.'},
+    {k:'fill',q:'Pouvoir calorifique bois ≈ 15 MJ/kg = ___ J/kg.',ans:'15000000',acc:['15000000','15 000 000'],ph:'ex: 15000000',hint:'Méga = 10⁶, donc 15 MJ = 15×10⁶ J',expl:'15 MJ = <code>15 000 000 J</code>. Le bois a un PC bien inférieur au fioul (≈42 MJ/kg).'},
+    {k:'mcq',q:'La chaux vive + eau est une réaction :',opts:['Endothermique','Neutre','Exothermique','Sans échange thermique'],ans:2,expl:'CaO + H₂O → Ca(OH)₂ libère beaucoup de chaleur : <strong>exothermique</strong>.'},
+    {k:'mcq',q:'Un triangle du feu manquant d\'énergie d\'activation :',opts:['Brûle davantage','N\'est pas allumé','Produit CO','Explose'],ans:1,expl:'Sans <strong>énergie d\'activation</strong> (étincelle, flamme), la réaction ne démarre pas.'},
+    {k:'fill',q:'PC gaz naturel = 50 000 kJ/kg. 0,1 kg → ___ kJ.',ans:'5000',acc:['5000','5 000'],ph:'ex: 5000',hint:'50000 × 0,1',expl:'E = 50 000 × 0,1 = <code>5 000 kJ</code>.'}]},
   {id:'ch3',icon:'🔌',color:'#38bdf8',nodeColor:'#38bdf8',title:'Tension & Intensité',sub:'Loi d\'Ohm, lois des nœuds et des mailles.',level:'🟢 1re',steps:[
     {k:'theory',ico:'⚡',title:'Courant, tension et loi d\'Ohm',sub:'Les bases de l\'électricité',
       html:`<p>Le <strong>courant électrique</strong> = déplacement d'électrons. Il s'exprime en <strong>Ampère (A)</strong>.</p>
@@ -940,7 +1094,18 @@ const CUR = [
     {k:'mcq',q:'Dans un nœud, 3 A et 2 A entrent. Combien sort-il ?',
       opts:['1 A','2 A','5 A','6 A'],ans:2,
       expl:'Loi des nœuds : 3 + 2 = <code>5 A</code> sortent.'},
-  ]},
+    {k:'fill',q:'U = 6 V, R = 30 Ω. I = ___ A.',ans:'0.2',acc:['0.2','0,2'],ph:'ex: 0.2',hint:'I = U/R = 6/30',expl:'I = 6/30 = <code>0,2 A</code>.'},
+    {k:'mcq',q:'En série, l\'intensité est :',opts:['Différente pour chaque dipôle','La même partout','Nulle','Maximale au générateur'],ans:1,expl:'En <strong>série</strong>, l\'intensité est identique en tout point du circuit.'},
+    {k:'fill',q:'En parallèle : I_total = I1 + I2. I1=1,5 A, I2=2,5 A. I_total = ___ A.',ans:'4',acc:['4','4.0'],ph:'ex: 4',hint:'1,5 + 2,5',expl:'I_total = 1,5 + 2,5 = <code>4 A</code>.'},
+    {k:'mcq',q:'La loi des mailles implique que dans une maille :',opts:['Σ U = U_générateur','Σ U = 0','Σ I = 0','Σ R = constante'],ans:1,expl:'Loi des mailles : la <strong>somme algébrique des tensions</strong> dans une maille fermée = 0.'},
+    {k:'fill',q:'R1=10 Ω, R2=40 Ω en série. U_total = 100 V. I = ___ A.',ans:'2',acc:['2','2.0'],ph:'ex: 2',hint:'R_tot = 50 Ω, I = U/R_tot',expl:'R_tot = 50 Ω → I = 100/50 = <code>2 A</code>.'},
+    {k:'pairs',q:'Associe circuit et caractéristique :',pairs:[['Série','Même intensité'],['Parallèle','Même tension'],['Court-circuit','Résistance nulle'],['Circuit ouvert','Intensité nulle']],expl:'Série : I identique, tensions s\'additionnent. Parallèle : U identique, courants s\'additionnent.'},
+    {k:'fill',q:'Un nœud reçoit 4 A et 3 A, et envoie I₂. I₂ = ___ A.',ans:'7',acc:['7','7.0'],ph:'ex: 7',hint:'Loi des nœuds : 4 + 3 = I₂',expl:'I₂ = 4 + 3 = <code>7 A</code> (loi des nœuds).'},
+    {k:'mcq',q:'Un voltmètre se branche :',opts:['En série','En dérivation (parallèle)','N\'importe comment','En court-circuit'],ans:1,expl:'Le voltmètre mesure une tension → il se branche <strong>en dérivation</strong> (parallèle) aux bornes du dipôle.'},
+    {k:'fill',q:'U1 = 3 V, U2 = 5 V en série. U_total = ___ V.',ans:'8',acc:['8'],ph:'ex: 8',hint:'En série : U_total = U1 + U2',expl:'U_total = 3 + 5 = <code>8 V</code>.'},
+    {k:'mcq',q:'L\'ampèremètre se branche :',opts:['En dérivation','En série','Aux bornes de la résistance','En parallèle'],ans:1,expl:'L\'ampèremètre mesure l\'intensité → il se branche <strong>en série</strong> dans le circuit.'},
+    {k:'fill',q:'R1 = R2 = 100 Ω en parallèle. R_équivalent = ___ Ω.',ans:'50',acc:['50'],ph:'ex: 50',hint:'1/R_eq = 1/R1 + 1/R2 = 1/100 + 1/100',expl:'1/R_eq = 2/100 → R_eq = <code>50 Ω</code>.'},
+    {k:'mcq',q:'3 dipôles en série : U_total = 12 V, chaque U = :',opts:['12 V','36 V','4 V','6 V'],ans:2,expl:'En série, les tensions s\'additionnent → chaque dipôle prend 12/3 = <strong>4 V</strong> (si identiques).'}]},
   {id:'ch4',icon:'💡',color:'#38bdf8',nodeColor:'#38bdf8',title:'Puissance Électrique',sub:'P = UI, énergie électrique et effet Joule.',level:'🟢 1re',steps:[
     {k:'theory',ico:'⚡',title:'Puissance et énergie électrique',sub:'P = UI et E = Pt',
       html:`<div class="fbox"><div class="fmain">P = U × I</div><div class="fleg"><div class="fi"><b>P</b> puissance (W)</div><div class="fi"><b>U</b> tension (V)</div><div class="fi"><b>I</b> intensité (A)</div></div></div>
@@ -959,7 +1124,18 @@ const CUR = [
     {k:'mcq',q:'Pour réduire les pertes Joule lors du transport, on :',
       opts:['Augmente l\'intensité','Augmente la tension','Diminue la tension','Augmente la résistance'],ans:1,
       expl:'P_Joule = R×I². Si on <strong>augmente la tension</strong>, l\'intensité diminue et les pertes chutent.'},
-  ]},
+    {k:'fill',q:'P = 100 W, t = 60 s. E = ___ J.',ans:'6000',acc:['6000','6 000'],ph:'ex: 6000',hint:'E = P × t = 100 × 60',expl:'E = 100 × 60 = <code>6 000 J</code>.'},
+    {k:'mcq',q:'Un grille-pain : U = 230 V, I = 4 A. P = :',opts:['57,5 W','57,5 kW','920 W','920 kW'],ans:2,expl:'P = U × I = 230 × 4 = <strong>920 W</strong>.'},
+    {k:'fill',q:'R = 50 Ω, I = 2 A. Puissance Joule P = ___ W.',ans:'200',acc:['200'],ph:'ex: 200',hint:'P_Joule = R × I² = 50 × 4',expl:'P = 50 × 4 = <code>200 W</code>.'},
+    {k:'pairs',q:'Associe formule et grandeur calculée :',pairs:[['P = U × I','Puissance'],['E = P × t','Énergie'],['P = R × I²','Pertes Joule'],['I = P / U','Intensité']],expl:'Ces formules permettent de retrouver toutes les grandeurs électriques.'},
+    {k:'fill',q:'1 kWh = ___ J.',ans:'3600000',acc:['3600000','3 600 000'],ph:'ex: 3600000',hint:'1 kW = 1000 W, 1h = 3600 s',expl:'1 kWh = 1000 × 3600 = <code>3 600 000 J</code>.'},
+    {k:'mcq',q:'Pour réduire les pertes Joule P = RI², on doit :',opts:['Augmenter I','Augmenter R','Diminuer I','Diminuer R uniquement'],ans:2,expl:'P ∝ I² → <strong>diminuer I</strong> réduit drastiquement les pertes. D\'où le transport en haute tension.'},
+    {k:'fill',q:'P = 2500 W, U = 250 V. I = ___ A.',ans:'10',acc:['10'],ph:'ex: 10',hint:'I = P/U = 2500/250',expl:'I = 2500/250 = <code>10 A</code>.'},
+    {k:'mcq',q:'Une lampe 60 W fonctionne 5 h. Énergie consommée :',opts:['300 J','300 Wh','12 J','1080 kJ'],ans:1,expl:'E = 60 W × 5 h = <strong>300 Wh</strong> = 0,3 kWh = 1 080 000 J.'},
+    {k:'fill',q:'R = 10 Ω, U = 20 V. P_Joule = ___ W.',ans:'40',acc:['40'],ph:'ex: 40',hint:'I = U/R = 2 A, P = R × I²= 10 × 4',expl:'I = 20/10 = 2 A → P = 10 × 4 = <code>40 W</code>.'},
+    {k:'mcq',q:'L\'effet Joule transforme l\'énergie électrique en :',opts:['Énergie mécanique','Énergie lumineuse','Chaleur','Énergie chimique'],ans:2,expl:'L\'<strong>effet Joule</strong> est la conversion d\'énergie électrique en <strong>chaleur</strong>.'},
+    {k:'fill',q:'E = 7 200 000 J = ___ kWh.',ans:'2',acc:['2','2.0'],ph:'ex: 2',hint:'kWh = J / 3 600 000',expl:'7 200 000 / 3 600 000 = <code>2 kWh</code>.'},
+    {k:'mcq',q:'Le transport d\'énergie à très haute tension (400 kV) permet de :',opts:['Augmenter la puissance','Réduire les pertes Joule','Augmenter l\'intensité','Supprimer la résistance'],ans:1,expl:'U ↑ → I ↓ → P_Joule = RI² ↓. Les <strong>lignes THT</strong> minimisent les pertes de transport.'}]},
   {id:'ch5',icon:'🌡️',color:'#fb923c',nodeColor:'#fb923c',title:'Énergie Interne & Chaleur',sub:'Q = mcΔθ et les 3 modes de transfert thermique.',level:'🟢 1re',steps:[
     {k:'theory',ico:'♨️',title:'Les 3 transferts thermiques',sub:'Conduction, convection, rayonnement',
       html:`<div class="tip"><div class="tiico">🧱</div><div class="titxt"><strong>Conduction</strong> : de proche en proche, sans déplacement de matière. Seul mode dans les solides.</div></div>
@@ -977,7 +1153,18 @@ const CUR = [
     {k:'mcq',q:'Le seul mode de transfert thermique dans un solide est :',
       opts:['Convection','Rayonnement','Conduction','Les trois'],ans:2,
       expl:'Dans un <strong>solide</strong>, les particules ne se déplacent pas → seule la <strong>conduction</strong> est possible.'},
-  ]},
+    {k:'fill',q:'m = 1 kg, c = 4180 J/(kg·°C), Δθ = 10°C. Q = ___ J.',ans:'41800',acc:['41800','41 800'],ph:'ex: 41800',hint:'Q = m × c × Δθ = 1 × 4180 × 10',expl:'Q = <code>41 800 J</code>.'},
+    {k:'mcq',q:'La convection se produit dans :',opts:['Les solides uniquement','Les gaz et liquides','Le vide uniquement','Tous les milieux'],ans:1,expl:'La <strong>convection</strong> nécessite un mouvement de matière → impossible dans les solides.'},
+    {k:'fill',q:'m = 0,5 kg d\'eau (c=4180), θ₁=20°C, θ₂=100°C. Q = ___ J.',ans:'167200',acc:['167200','167 200'],ph:'ex: 167200',hint:'Q = 0,5 × 4180 × 80',expl:'Q = 0,5 × 4180 × 80 = <code>167 200 J</code>.'},
+    {k:'pairs',q:'Associe transfert thermique à son principe :',pairs:[['Conduction','De proche en proche'],['Convection','Déplacement de matière'],['Rayonnement','Onde EM, sans matière'],['Isolation','Réduction des 3 modes']],expl:'Une bonne isolation thermique limite simultanément les 3 modes de transfert.'},
+    {k:'mcq',q:'Le Soleil chauffe la Terre principalement par :',opts:['Conduction','Convection','Rayonnement','Les trois à parts égales'],ans:2,expl:'L\'espace est le vide → seul le <strong>rayonnement</strong> peut transporter l\'énergie solaire.'},
+    {k:'fill',q:'Q = 8360 J, m = 2 kg, c = 4180 J/(kg·°C). Δθ = ___ °C.',ans:'1',acc:['1','1.0'],ph:'ex: 1',hint:'Δθ = Q / (m×c) = 8360/(2×4180)',expl:'Δθ = 8360/8360 = <code>1°C</code>.'},
+    {k:'mcq',q:'Le cuivre conduit mieux la chaleur que le bois car :',opts:['Il est plus lourd','Il a plus d\'électrons libres','Il est plus brillant','Sa température est plus élevée'],ans:1,expl:'Les <strong>électrons libres</strong> des métaux transmettent l\'énergie thermique efficacement.'},
+    {k:'fill',q:'c alu = 900 J/(kg·°C), m = 2 kg, Δθ = 50°C. Q = ___ J.',ans:'90000',acc:['90000','90 000'],ph:'ex: 90000',hint:'Q = 2 × 900 × 50',expl:'Q = 2 × 900 × 50 = <code>90 000 J</code>.'},
+    {k:'mcq',q:'Les thermos limitent les transferts par :',opts:['Conduction uniquement','Double paroi sous vide + argentage (les 3)','Convection uniquement','Rayonnement uniquement'],ans:1,expl:'Double paroi sous vide → pas de conduction ni convection. Argentage → réduit le rayonnement.'},
+    {k:'fill',q:'Q = 62 700 J, m = 3 kg, Δθ = 5°C. c = ___ J/(kg·°C).',ans:'4180',acc:['4180'],ph:'ex: 4180',hint:'c = Q/(m×Δθ) = 62700/(3×5)',expl:'c = 62 700/15 = <code>4 180 J/(kg·°C)</code>. C\'est la capacité thermique de l\'eau.'},
+    {k:'mcq',q:'Un radiateur à eau utilise principalement :',opts:['Conduction','Convection','Rayonnement','Fusion'],ans:1,expl:'L\'eau chaude monte, se refroidit et redescend : c\'est la <strong>convection</strong>.'},
+    {k:'mcq',q:'La capacité thermique massique de l\'eau (4180 J/kg·°C) est :',opts:['Très faible','La plus faible de tous les liquides','Très élevée','Identique à celle des métaux'],ans:2,expl:'L\'eau a une capacité thermique <strong>très élevée</strong> → elle accumule et restitue beaucoup d\'énergie.'}]},
   {id:'ch6',icon:'❄️',color:'#fb923c',nodeColor:'#fb923c',title:'Bilan Énergétique',sub:'Changements d\'état, chaleur latente Q = mL.',level:'🟢 1re',steps:[
     {k:'theory',ico:'🧊',title:'Changements d\'état',sub:'La température reste constante',
       html:`<p>Pendant un changement d'état d'un corps pur, la <strong>température reste constante</strong>. Seule l'énergie potentielle microscopique varie.</p>
@@ -994,7 +1181,18 @@ const CUR = [
     {k:'fill',q:'Fondre 0,5 kg de glace (L = 334 000 J/kg). Q = ___ J.',ph:'ex: 167000',
       ans:'167000',acc:['167000','167 000'],hint:'Q = m × L = 0,5 × 334000',
       expl:'Q = 0,5 × 334 000 = <code>167 000 J</code>.'},
-  ]},
+    {k:'fill',q:'m = 2 kg, L_fusion = 334 000 J/kg. Q = ___ J.',ans:'668000',acc:['668000','668 000'],ph:'ex: 668000',hint:'Q = m × L = 2 × 334000',expl:'Q = <code>668 000 J</code>.'},
+    {k:'mcq',q:'Lors de la vaporisation, l\'énergie :',opts:['Est libérée','Est absorbée','Reste constante','Diminue'],ans:1,expl:'La vaporisation est <strong>endothermique</strong> : elle absorbe de l\'énergie pour rompre les liaisons.'},
+    {k:'fill',q:'L_vap eau = 2 260 000 J/kg. Vaporiser 0,1 kg d\'eau → Q = ___ J.',ans:'226000',acc:['226000','226 000'],ph:'ex: 226000',hint:'Q = 0,1 × 2 260 000',expl:'Q = <code>226 000 J</code>.'},
+    {k:'pairs',q:'Associe changement d\'état à l\'énergie :',pairs:[['Vaporisation','Endothermique'],['Condensation','Exothermique'],['Sublimation','Endothermique'],['Solidification','Exothermique']],expl:'Vers le désordre (solide→gaz) = endothermique. Vers l\'ordre (gaz→solide) = exothermique.'},
+    {k:'mcq',q:'Lors de la solidification d\'un corps pur :',opts:['La T augmente','La T diminue','La T reste constante','La T oscille'],ans:2,expl:'Tout changement d\'état d\'un corps pur se fait à <strong>température constante</strong>.'},
+    {k:'fill',q:'m = 0,3 kg, L_fusion = 334 000 J/kg. Pour fondre : Q = ___ J.',ans:'100200',acc:['100200','100 200'],ph:'ex: 100200',hint:'Q = 0,3 × 334000',expl:'Q = 0,3 × 334 000 = <code>100 200 J</code>.'},
+    {k:'mcq',q:'L\'énergie de vaporisation de l\'eau est :',opts:['Identique à la fusion','Plus faible que la fusion','Beaucoup plus grande que la fusion','Nulle'],ans:2,expl:'L_vap = 2 260 kJ/kg >> L_fusion = 334 kJ/kg. Il faut 6,8× plus d\'énergie pour vaporiser.'},
+    {k:'fill',q:'Q = 167 000 J, m = 0,5 kg. L = ___ J/kg.',ans:'334000',acc:['334000','334 000'],ph:'ex: 334000',hint:'L = Q/m = 167000/0,5',expl:'L = 167 000/0,5 = <code>334 000 J/kg</code>. C\'est la chaleur latente de fusion de l\'eau.'},
+    {k:'mcq',q:'La sublimation est :',opts:['Liquide → gaz','Solide → gaz directement','Gaz → solide','Solide → liquide'],ans:1,expl:'La <strong>sublimation</strong> = passage direct de l\'état solide à l\'état gazeux (ex: glace carbonique).'},
+    {k:'mcq',q:'L\'évaporation de la sueur refroidit le corps car :',opts:['Elle est exothermique','Elle absorbe de l\'énergie (endothermique)','Elle produit du CO₂','Elle augmente la pression'],ans:1,expl:'La vaporisation est <strong>endothermique</strong> : elle pompe la chaleur du corps pour s\'évaporer.'},
+    {k:'fill',q:'Corps pur : T_fusion = 0°C. À -10°C l\'eau est :',ans:'solide',acc:['solide','à l\'état solide'],ph:'ex: solide',hint:'En dessous du point de fusion',expl:'À -10°C < 0°C : l\'eau est à l\'état <code>solide</code> (glace).'},
+    {k:'pairs',q:'Associe terme à sa définition :',pairs:[['Fusion','Solide → Liquide'],['Vaporisation','Liquide → Gaz'],['Condensation','Gaz → Liquide'],['Solidification','Liquide → Solide']],expl:'6 changements d\'état : fusion, vaporisation, sublimation + leurs inverses.'}]},
   {id:'ch7',icon:'🚀',color:'#39d353',nodeColor:'#39d353',title:'Mouvement & Vitesse',sub:'Référentiels, vecteur vitesse, accélération et 1re loi de Newton.',level:'🟢 1re',steps:[
     {k:'theory',ico:'📍',title:'Référentiels et vitesse',sub:'Décrire le mouvement',
       html:`<p>Un <strong>référentiel</strong> = solide de référence + horloge.</p>
@@ -1012,7 +1210,18 @@ const CUR = [
     {k:'mcq',q:'Le référentiel héliocentrique est centré sur :',
       opts:['La Terre','La Lune','Le Soleil','Une étoile lointaine'],ans:2,
       expl:'Héliocentrique (Helios = Soleil) → centré sur le Soleil. Utilisé pour décrire les mouvements des planètes.'},
-  ]},
+    {k:'fill',q:'d = 180 m, Δt = 15 s. v_moy = ___ m/s.',ans:'12',acc:['12'],ph:'ex: 12',hint:'v = d/Δt = 180/15',expl:'v_moy = 180/15 = <code>12 m/s</code>.'},
+    {k:'mcq',q:'Un mouvement rectiligne uniforme (MRU) a :',opts:['Vitesse variable','Accélération non nulle','Vitesse constante','Trajectoire courbe'],ans:2,expl:'MRU = trajectoire rectiligne + <strong>vitesse constante</strong> → Σ F = 0.'},
+    {k:'fill',q:'v = 30 m/s, t = 10 s. Distance d = ___ m.',ans:'300',acc:['300'],ph:'ex: 300',hint:'d = v × t',expl:'d = 30 × 10 = <code>300 m</code>.'},
+    {k:'pairs',q:'Associe référentiel à son usage :',pairs:[['Terrestre','Mouvements à la surface'],['Géocentrique','Satellites artificiels'],['Héliocentrique','Planètes du système solaire'],['Galiléen','Lois de Newton applicables']],expl:'Le choix du référentiel détermine comment on décrit un mouvement.'},
+    {k:'mcq',q:'La 1re loi de Newton dit que sans force :',opts:['L\'objet s\'arrête','L\'objet accélère','L\'objet garde son état de mouvement','L\'objet tourne'],ans:2,expl:'<strong>Principe d\'inertie</strong> : si Σ F = 0, la vitesse reste constante (nulle ou non).'},
+    {k:'fill',q:'v = 108 km/h = ___ m/s.',ans:'30',acc:['30'],ph:'ex: 30',hint:'108 / 3,6',expl:'108 / 3,6 = <code>30 m/s</code>.'},
+    {k:'mcq',q:'Un vecteur vitesse indique :',opts:['La direction et la norme','La direction, le sens et la norme','La norme uniquement','Le sens uniquement'],ans:1,expl:'Un vecteur a 3 caractéristiques : <strong>direction, sens et norme</strong> (intensité).'},
+    {k:'fill',q:'Δt = 4 s, v = 25 m/s. d = ___ m.',ans:'100',acc:['100'],ph:'ex: 100',hint:'d = 25 × 4',expl:'d = 25 × 4 = <code>100 m</code>.'},
+    {k:'mcq',q:'Dans le référentiel géocentrique, la Lune a un mouvement :',opts:['Rectiligne uniforme','Circulaire (approximativement)','Parabolique','Stationnaire'],ans:1,expl:'La Lune décrit une orbite <strong>quasi-circulaire</strong> autour de la Terre dans le référentiel géocentrique.'},
+    {k:'fill',q:'v₁ = 10 m/s, v₂ = 20 m/s (rectiligne). Δv = ___ m/s.',ans:'10',acc:['10'],ph:'ex: 10',hint:'Δv = v₂ - v₁',expl:'Δv = 20 - 10 = <code>10 m/s</code>. L\'objet a accéléré.'},
+    {k:'mcq',q:'Une voiture freine : son mouvement est :',opts:['Rectiligne uniforme','Rectiligne accéléré','Rectiligne décéléré','Circulaire'],ans:2,expl:'Freinage = décélération → <strong>mouvement rectiligne décéléré</strong> (vitesse diminue).'},
+    {k:'pairs',q:'Associe type de mouvement à son vecteur vitesse :',pairs:[['MRU','Vitesse constante'],['MRUA','Vitesse augmente'],['MRUD','Vitesse diminue'],['Circulaire uniforme','Direction change']],expl:'MRUA = Mouvement Rectiligne Uniformément Accéléré. MRUD = décéléré.'}]},
   {id:'ch8',icon:'🏋️',color:'#39d353',nodeColor:'#39d353',title:'Énergie Mécanique',sub:'Ec = ½mv², Epp = mgz, Em = Ec + Ep.',level:'🟢 1re',steps:[
     {k:'theory',ico:'🏃',title:'Énergie cinétique',sub:'L\'énergie du mouvement',
       html:`<div class="fbox"><div class="fmain">Ec = ½ × m × v²</div><div class="fleg"><div class="fi"><b>Ec</b> énergie cinétique (J)</div><div class="fi"><b>m</b> masse (kg)</div><div class="fi"><b>v</b> vitesse (m/s)</div></div></div>
@@ -1029,7 +1238,18 @@ const CUR = [
     {k:'mcq',q:'Sans frottements, l\'énergie mécanique d\'un objet :',
       opts:['Augmente','Diminue','Reste constante','Devient nulle'],ans:2,
       expl:'Sans frottements, <strong>Em est conservée</strong> : Ec et Ep se convertissent mutuellement, leur somme reste constante.'},
-  ]},
+    {k:'fill',q:'m = 3 kg, v = 4 m/s. Ec = ___ J.',ans:'24',acc:['24'],ph:'ex: 24',hint:'Ec = ½ × 3 × 4² = ½ × 3 × 16',expl:'Ec = ½ × 3 × 16 = <code>24 J</code>.'},
+    {k:'mcq',q:'Une balle monte : l\'énergie cinétique :',opts:['Augmente','Reste constante','Diminue','Devient nulle immédiatement'],ans:2,expl:'En montant, v diminue → Ec = ½mv² <strong>diminue</strong>. Ec se convertit en Ep.'},
+    {k:'fill',q:'m = 4 kg, g = 9,8 m/s², z = 5 m. Epp = ___ J.',ans:'196',acc:['196'],ph:'ex: 196',hint:'Epp = m × g × z = 4 × 9,8 × 5',expl:'Epp = 4 × 9,8 × 5 = <code>196 J</code>.'},
+    {k:'pairs',q:'Associe situation à type d\'énergie dominant :',pairs:[['Balle au sommet','Énergie potentielle max'],['Balle au sol','Énergie cinétique max'],['Satellite en orbite','Ec + Ep constante'],['Freinage','Ec → chaleur']],expl:'Sans frottement, l\'énergie mécanique totale (Ec + Ep) se conserve.'},
+    {k:'fill',q:'Ec = 200 J, m = 4 kg. v = ___ m/s.',ans:'10',acc:['10'],ph:'ex: 10',hint:'v = √(2Ec/m) = √(400/4) = √100',expl:'v = √(2×200/4) = √100 = <code>10 m/s</code>.'},
+    {k:'mcq',q:'La conservation de l\'énergie mécanique s\'applique :',opts:['Toujours','Seulement avec frottements','Sans frottements','Uniquement en chute libre'],ans:2,expl:'Em = Ec + Ep est conservée <strong>sans frottements</strong>. Les frottements dissipent Ec en chaleur.'},
+    {k:'fill',q:'m = 10 kg tombe de h = 20 m (g=10). Ec max = ___ J.',ans:'2000',acc:['2000','2 000'],ph:'ex: 2000',hint:'Em = Epp initiale = m×g×h = 10×10×20',expl:'Em = 10×10×20 = 2000 J → Ec_max = <code>2 000 J</code> en bas.'},
+    {k:'mcq',q:'Doubler la vitesse multiplie l\'énergie cinétique par :',opts:['2','3','4','8'],ans:2,expl:'Ec = ½mv². Si v×2, alors Ec×2² = <strong>×4</strong>.'},
+    {k:'fill',q:'Epp = 0 en bas. m = 2 kg, g = 10, v_bas = 6 m/s. h = ___ m.',ans:'1.8',acc:['1.8','1,8'],ph:'ex: 1.8',hint:'Epp = Ec → m×g×h = ½mv² → h = v²/(2g)',expl:'h = 36/(2×10) = 36/20 = <code>1,8 m</code>.'},
+    {k:'mcq',q:'Un pendule : au point le plus bas, son énergie :',opts:['Potentielle est max','Cinétique est nulle','Cinétique est max','Mécanique est nulle'],ans:2,expl:'Au point bas, Epp est minimale et <strong>Ec est maximale</strong> (vitesse maximale).'},
+    {k:'fill',q:'m=1 kg, v=10 m/s. Ec = ___ J.',ans:'50',acc:['50'],ph:'ex: 50',hint:'Ec = ½ × 1 × 100',expl:'Ec = ½ × 1 × 100 = <code>50 J</code>.'},
+    {k:'mcq',q:'La chute libre sans air : l\'énergie mécanique :',opts:['Augmente','Diminue','Se conserve','Devient nulle'],ans:2,expl:'Sans résistance de l\'air (frottements nuls), <strong>Em se conserve</strong> : Ep se convertit en Ec.'}]},
   {id:'ch9',icon:'☀️',color:'#fbbf24',nodeColor:'#fbbf24',title:'Énergie Lumineuse',sub:'Irradiance, panneaux photovoltaïques et lasers.',level:'🔵 Terminale',steps:[
     {k:'theory',ico:'🌞',title:'Irradiance et flux énergétique',sub:'Puissance surfacique',
       html:`<div class="fbox"><div class="fmain">I = ϕ_E / S</div><div class="fleg"><div class="fi"><b>I</b> irradiance (W/m²)</div><div class="fi"><b>ϕ_E</b> flux énergétique (W)</div><div class="fi"><b>S</b> surface (m²)</div></div></div>
@@ -1047,7 +1267,18 @@ const CUR = [
     {k:'mcq',q:'Quelle propriété distingue la lumière LASER ?',
       opts:['Elle est invisible','Elle est monochromatique et directive','Elle va plus vite','Elle ne chauffe pas'],ans:1,
       expl:'Le laser est <strong>monochromatique</strong> (une seule λ) et <strong>directif</strong>. La lumière blanche est polychromatique et divergente.'},
-  ]},
+    {k:'fill',q:'I = 1200 W/m², S = 3 m². Flux ϕ = ___ W.',ans:'3600',acc:['3600','3 600'],ph:'ex: 3600',hint:'ϕ = I × S',expl:'ϕ = 1200 × 3 = <code>3 600 W</code>.'},
+    {k:'mcq',q:'Un laser est caractérisé par :',opts:['Lumière blanche divergente','Lumière monochromatique et directive','Lumière infrarouge uniquement','Lumière incohérente'],ans:1,expl:'LASER : <strong>monochromatique</strong> (une λ unique) + <strong>directif</strong> (faisceau peu divergent).'},
+    {k:'fill',q:'ϕ = 500 W, η = 18%. P_électrique = ___ W.',ans:'2778',acc:['2778','2777','2780'],ph:'ex: 2778',hint:'P_élec = ϕ/η = 500/0,18',expl:'P_élec = 500/0,18 ≈ <code>2 778 W</code>.'},
+    {k:'pairs',q:'Associe application à la source lumineuse :',pairs:[['Chirurgie oculaire','Laser'],['Éclairage intérieur','LED'],['Énergie électrique','Panneau PV'],['Télémétrie','Laser pulsé']],expl:'Les lasers ont des applications très précises grâce à leur cohérence et directivité.'},
+    {k:'mcq',q:'L\'irradiance solaire au sol vaut environ :',opts:['100 W/m²','500 W/m²','1000 W/m²','10 000 W/m²'],ans:2,expl:'Par ciel dégagé, l\'irradiance vaut ≈ <strong>1000 W/m²</strong>.'},
+    {k:'fill',q:'S = 5 m², η = 0,20, I = 900 W/m². P_élec = ___ W.',ans:'900',acc:['900'],ph:'ex: 900',hint:'P = η × I × S = 0,20 × 900 × 5',expl:'P = 0,20 × 900 × 5 = <code>900 W</code>.'},
+    {k:'mcq',q:'E (lux) = Φ / S. Un flux de 2000 lm sur 4 m² donne :',opts:['500 lx','8000 lx','0,002 lx','200 lx'],ans:0,expl:'E = 2000/4 = <strong>500 lx</strong>. Le lux mesure l\'éclairement reçu par une surface.'},
+    {k:'fill',q:'I = 600 W/m², η = 15%. Puissance par m² = ___ W/m².',ans:'90',acc:['90'],ph:'ex: 90',hint:'P = η × I = 0,15 × 600',expl:'P = 0,15 × 600 = <code>90 W/m²</code>.'},
+    {k:'mcq',q:'LASER signifie (en anglais) :',opts:['Light Amplification by Stimulated Emission of Radiation','Light And Sound Emission Relay','Large Amplification Solar Energy Radio','Light Analysis Spectral Emission Range'],ans:0,expl:'<strong>L</strong>ight <strong>A</strong>mplification by <strong>S</strong>timulated <strong>E</strong>mission of <strong>R</strong>adiation.'},
+    {k:'fill',q:'Eclairement E = 800 lx, S = 10 m². Flux Φ = ___ lm.',ans:'8000',acc:['8000','8 000'],ph:'ex: 8000',hint:'Φ = E × S = 800 × 10',expl:'Φ = 800 × 10 = <code>8 000 lm</code>.'},
+    {k:'mcq',q:'La puissance installée en panneaux solaires est maximale :',opts:['La nuit','Par temps nuageux','Par temps ensoleillé à midi','En hiver'],ans:2,expl:'L\'irradiance est maximale quand le soleil est au zénith → puissance solaire <strong>maximale</strong>.'},
+    {k:'pairs',q:'Associe grandeur photométrique à son unité :',pairs:[['Flux lumineux','Lumen (lm)'],['Eclairement','Lux (lx)'],['Irradiance','W/m²'],['Intensité lumineuse','Candela (cd)']],expl:'Attention à ne pas confondre irradiance (W/m²) et éclairement (lx) !'}]},
   {id:'ch10',icon:'🧲',color:'#c084fc',nodeColor:'#c084fc',title:'Matériaux & Chimie',sub:'Familles de matériaux, groupes caractéristiques et concentration.',level:'🔵 Terminale',steps:[
     {k:'theory',ico:'🏗️',title:'Familles de matériaux',sub:'Métalliques, minéraux et organiques',
       html:`<p>3 familles principales :</p>
@@ -1068,7 +1299,18 @@ const CUR = [
     {k:'mcq',q:'La formule semi-développée ne représente pas :',
       opts:['Les liaisons C-C','Les liaisons C=C','Les liaisons C-H','Les doublets non-liants'],ans:2,
       expl:'La formule <strong>semi-développée</strong> simplifie en ne montrant pas les liaisons <strong>C-H</strong> (ni les doublets non-liants, contrairement au schéma de Lewis).'},
-  ]},
+    {k:'fill',q:'n = 0,1 mol dans V = 0,05 L. C = ___ mol/L.',ans:'2',acc:['2','2.0'],ph:'ex: 2',hint:'C = n/V = 0,1/0,05',expl:'C = 0,1/0,05 = <code>2 mol/L</code>.'},
+    {k:'mcq',q:'La fibre de carbone est un matériau :',opts:['Purement métallique','Purement minéral','Composite','Purement organique'],ans:2,expl:'La fibre de carbone combine fibre (carbone = organique) + résine (organique/polymère) → <strong>composite</strong>.'},
+    {k:'fill',q:'Cm = 36 g/L, M(NaCl) = 58 g/mol. C = ___ mol/L.',ans:'0.62',acc:['0.62','0,62','0.621','0,621'],ph:'ex: 0.62',hint:'C = Cm/M = 36/58',expl:'C = 36/58 ≈ <code>0,62 mol/L</code>.'},
+    {k:'pairs',q:'Associe matériau à sa famille :',pairs:[['Verre','Minéral'],['Caoutchouc','Organique'],['Acier inox','Métallique'],['Béton armé','Composite']],expl:'Le béton armé = béton (minéral) + acier (métallique) → composite.'},
+    {k:'mcq',q:'La formule semi-développée d\'un alcane montre :',opts:['Tous les atomes avec doublets','Liaisons C-C et C=C mais pas C-H','Les groupes CH₃ et CH₂ sans les H','Uniquement la formule brute'],ans:2,expl:'Semi-développée : on voit les squelettes <strong>C-C</strong> avec groupes, mais les H des carbones sont implicites.'},
+    {k:'fill',q:'Ethanol C₂H₅OH, M = 46 g/mol. Cm = 46 g/L → C = ___ mol/L.',ans:'1',acc:['1','1.0'],ph:'ex: 1',hint:'C = Cm/M = 46/46',expl:'C = 46/46 = <code>1 mol/L</code>.'},
+    {k:'mcq',q:'Quel groupe caractéristique est présent dans les alcools ?',opts:['-COOH','-OH','-NH₂','-CHO'],ans:1,expl:'Les <strong>alcools</strong> ont un groupe hydroxyle <strong>-OH</strong>. Ex : éthanol C₂H₅-OH.'},
+    {k:'fill',q:'V = 0,250 L de solution, C = 0,5 mol/L. n = ___ mol.',ans:'0.125',acc:['0.125','0,125','1.25e-1'],ph:'ex: 0.125',hint:'n = C × V = 0,5 × 0,250',expl:'n = 0,5 × 0,250 = <code>0,125 mol</code>.'},
+    {k:'mcq',q:'Les céramiques sont des matériaux :',opts:['Métalliques','Organiques','Minéraux obtenus par cuisson','Composites toujours'],ans:2,expl:'Les céramiques sont des <strong>matériaux minéraux</strong> obtenus par traitement thermique (cuisson).'},
+    {k:'fill',q:'m(NaOH) = 4 g, M = 40 g/mol. n = ___ mol.',ans:'0.1',acc:['0.1','0,1'],ph:'ex: 0.1',hint:'n = m/M = 4/40',expl:'n = 4/40 = <code>0,1 mol</code>.'},
+    {k:'mcq',q:'Un acide carboxylique contient le groupe :',opts:['-OH','-CHO','-COOH','-CO-'],ans:2,expl:'Les <strong>acides carboxyliques</strong> ont le groupe -COOH (ex: acide acétique CH₃-COOH).'},
+    {k:'pairs',q:'Associe formule à la famille organique :',pairs:[['R-OH','Alcool'],['R-COOH','Acide carboxylique'],['R-CO-R\'','Cétone'],['R-CHO','Aldéhyde']],expl:'Groupes caractéristiques = clé pour identifier la famille d\'un composé organique.'}]},
   {id:'ch11',icon:'🧪',color:'#c084fc',nodeColor:'#c084fc',title:'Combustions & Alcanes',sub:'Hydrocarbures, alcools et réactif limitant.',level:'🔵 Terminale',steps:[
     {k:'theory',ico:'⚗️',title:'Hydrocarbures : alcanes et alcènes',sub:'Formules générales',
       html:`<div class="fbox"><div class="fmain">Alcanes : CₙH₂ₙ₊₂</div><div class="fleg"><div class="fi">liaisons simples uniquement</div><div class="fi">ex: méthane CH₄, propane C₃H₈</div></div></div>
@@ -1086,7 +1328,18 @@ const CUR = [
     {k:'fill',q:'C₃H₈ + 5 O₂ → produits. Pour 2 mol de C₃H₈, il faut ___ mol de O₂.',ph:'ex: 10',
       ans:'10',acc:['10'],hint:'Coefficient de O₂ = 5, donc 2 × 5',
       expl:'2 mol C₃H₈ × 5 = <code>10 mol O₂</code>.'},
-  ]},
+    {k:'mcq',q:'La formule de l\'éthane (n=2) est :',opts:['C₂H₂','C₂H₄','C₂H₆','C₂H₈'],ans:2,expl:'Alcane : CₙH₂ₙ₊₂. n=2 → C₂H₂×₂₊₂ = C₂H₆ (<strong>éthane</strong>).'},
+    {k:'fill',q:'C₂H₆ + O₂ → 2CO₂ + 3H₂O. Coefficient O₂ = ___ .',ans:'3.5',acc:['3.5','7/2','3,5'],ph:'ex: 3.5',hint:'Équilibre : 2C→2CO₂(4 O), 3H₂O(3 O) → total 7O → 7/2 O₂',expl:'C₂H₆ + <code>7/2</code> O₂ → 2CO₂ + 3H₂O. Soit C₂H₆ + 3,5 O₂.'},
+    {k:'pairs',q:'Associe alcane à sa formule brute :',pairs:[['Méthane','CH₄'],['Propane','C₃H₈'],['Butane','C₄H₁₀'],['Pentane','C₅H₁₂']],expl:'CₙH₂ₙ₊₂ : méthane(n=1), éthane(2), propane(3), butane(4).'},
+    {k:'fill',q:'Alcène CₙH₂ₙ, n=4. Formule : C₄H___.',ans:'8',acc:['8'],ph:'ex: 8',hint:'CₙH₂ₙ → 2×4=8',expl:'C₄H₂×₄ = C₄H<code>8</code> (butène).'},
+    {k:'mcq',q:'Le propane C₃H₈ est un :',opts:['Alcène','Alcool','Alcane','Acide'],ans:2,expl:'C₃H₈ = CₙH₂ₙ₊₂ avec n=3 → formule des <strong>alcanes</strong>.'},
+    {k:'fill',q:'n(C₃H₈)=0,3 mol, stœchio 5 O₂. n(O₂) nécessaire = ___ mol.',ans:'1.5',acc:['1.5','1,5'],ph:'ex: 1.5',hint:'n(O₂) = 0,3 × 5',expl:'n(O₂) = 0,3 × 5 = <code>1,5 mol</code>.'},
+    {k:'mcq',q:'Pour trouver le réactif limitant avec C₃H₈/O₂ :',opts:['On compare les masses','On compare n(C₃H₈)/1 et n(O₂)/5','On compare les volumes','On compare les densités'],ans:1,expl:'Réactif limitant = ratio n/ν le plus faible. Ici n(C₃H₈)/1 vs n(O₂)/<strong>5</strong>.'},
+    {k:'fill',q:'n(C₂H₆)=1 mol, n(O₂)=3 mol. Réactif limitant ? ratio C₂H₆=1/1=___ , O₂=3/3,5=___ .',ans:'1 et 0.86',acc:['1 et 0.86','1 et 0,86'],ph:'ex: 1 et 0.86',hint:'Comparer 1/1 et 3/3,5',expl:'1 > 0,86 → O₂ est le réactif limitant (ratio le plus petit = <code>0,86</code>).'},
+    {k:'mcq',q:'Un alcène se distingue d\'un alcane par :',opts:['Plus d\'atomes d\'hydrogène','Une liaison double C=C','Une liaison triple C≡C','Un groupe -OH'],ans:1,expl:'Les <strong>alcènes</strong> ont au moins une liaison double C=C. Les alcanes ont uniquement des liaisons simples.'},
+    {k:'fill',q:'Méthane : CH₄. Combustion complète : CH₄ + ___ O₂ → CO₂ + 2H₂O.',ans:'2',acc:['2'],ph:'ex: 2',hint:'1C→CO₂ (2O), 2H₂O (2O) → 4O total → 2 O₂',expl:'CH₄ + <code>2</code> O₂ → CO₂ + 2H₂O.'},
+    {k:'mcq',q:'La formule générale des alcènes est :',opts:['CₙH₂ₙ₊₂','CₙH₂ₙ','CₙH₂ₙ₋₂','CₙHₙ'],ans:1,expl:'Alcènes : <strong>CₙH₂ₙ</strong> (une double liaison C=C retire 2 H par rapport aux alcanes).'},
+    {k:'pairs',q:'Associe réactif à son rôle dans la combustion :',pairs:[['Hydrocarbure','Combustible'],['O₂','Comburant'],['CO₂','Produit de combustion complète'],['CO','Produit de combustion incomplète']],expl:'La combustion = combustible + comburant (O₂) → produits.'}]},
   {id:'ch12',icon:'🔋',color:'#c084fc',nodeColor:'#c084fc',title:'Oxydoréduction & Piles',sub:'Couples redox, demi-équations et piles électrochimiques.',level:'🔵 Terminale',steps:[
     {k:'theory',ico:'⚡',title:'Oxydant, réducteur et couples redox',sub:'Échange d\'électrons',
       html:`<div class="tip"><div class="tiico">➕</div><div class="titxt"><strong>Oxydant</strong> : gagne des e⁻ → subit une <strong>réduction</strong> (ex: Cu²⁺)<br><strong>Réducteur</strong> : perd des e⁻ → subit une <strong>oxydation</strong> (ex: Fe)</div></div>
@@ -1104,7 +1357,18 @@ const CUR = [
     {k:'mcq',q:'Dans une pile, les électrons circulent :',
       opts:['Dans l\'électrolyte','Dans le pont salin','Dans le circuit extérieur','Ils ne bougent pas'],ans:2,
       expl:'Les <strong>électrons</strong> circulent dans les fils du <strong>circuit extérieur</strong>. Les ions circulent dans l\'électrolyte.'},
-  ]},
+    {k:'fill',q:'Cu²⁺ + 2e⁻ → Cu. C\'est une demi-équation de ___ .',ans:'reduction',acc:['reduction','réduction'],ph:'ex: reduction',hint:'Gain d\'électrons',expl:'Gain d\'électrons = <code>réduction</code>. Cu²⁺ est l\'oxydant.'},
+    {k:'mcq',q:'Fe → Fe²⁺ + 2e⁻ représente :',opts:['Une réduction','Une oxydation','Une combustion','Une neutralisation'],ans:1,expl:'Perte d\'électrons = <strong>oxydation</strong>. Fe est le réducteur.'},
+    {k:'pairs',q:'Associe terme redox à sa définition :',pairs:[['Oxydation','Perte d\'électrons'],['Réduction','Gain d\'électrons'],['Oxydant','Capte des e⁻'],['Réducteur','Cède des e⁻']],expl:'OIL RIG : Oxidation Is Loss, Reduction Is Gain.'},
+    {k:'fill',q:'Pile Daniell : Zn → Zn²⁺ + 2e⁻ (anode). Les électrons vont vers ___ .',ans:'cathode',acc:['cathode','la cathode'],ph:'ex: cathode',hint:'Électrons : anode → circuit ext → cathode',expl:'Les électrons circulent de l\'anode vers la <code>cathode</code> dans le circuit extérieur.'},
+    {k:'mcq',q:'L\'anode d\'une pile est :',opts:['Le pôle positif','Le pôle négatif','Le pont salin','L\'électrolyte'],ans:1,expl:'Anode = oxydation = <strong>pôle négatif (−)</strong>. Les électrons quittent l\'anode.'},
+    {k:'fill',q:'Zn²⁺/Zn et Cu²⁺/Cu. Zn se dissout : c\'est le réducteur. Cu²⁺ est l\'___ .',ans:'oxydant',acc:['oxydant','l\'oxydant'],ph:'ex: oxydant',hint:'Cu²⁺ capte des e⁻',expl:'Cu²⁺ + 2e⁻ → Cu → Cu²⁺ est l\'<code>oxydant</code>.'},
+    {k:'mcq',q:'Le pont salin dans une pile sert à :',opts:['Conduire les électrons','Maintenir la neutralité électrique','Produire de l\'électricité','Stopper la réaction'],ans:1,expl:'Le pont salin laisse passer les <strong>ions</strong> pour maintenir l\'électroneutralité des solutions.'},
+    {k:'fill',q:'Cu²⁺(aq) + Fe(s) → Cu(s) + Fe²⁺(aq). Oxydant = ___ .',ans:'Cu2+',acc:['Cu2+','Cu²⁺'],ph:'ex: Cu2+',hint:'Qui gagne des e⁻ ?',expl:'<code>Cu²⁺</code> gagne 2e⁻ → il est réduit → c\'est l\'oxydant.'},
+    {k:'mcq',q:'Équilibrer : MnO₄⁻ + 5e⁻ + 8H⁺ → Mn²⁺ + 4H₂O. C\'est :',opts:['Une oxydation','Une réduction','Une combustion','Une précipitation'],ans:1,expl:'MnO₄⁻ gagne 5e⁻ → <strong>réduction</strong>. MnO₄⁻ est un oxydant puissant.'},
+    {k:'fill',q:'Nombre d\'oxydation du Mn dans MnO₂ : Mn + 2×(−2) = 0 → Mn = ___ .',ans:'+4',acc:['+4','4'],ph:'ex: +4',hint:'O = -2, molécule neutre',expl:'Mn + (−4) = 0 → Mn = <code>+4</code>.'},
+    {k:'mcq',q:'La capacité d\'une pile s\'exprime en :',opts:['Volts','Ampères','Ampères-heures (Ah)','Watts'],ans:2,expl:'La <strong>capacité</strong> d\'une pile se mesure en <strong>Ah</strong> (ampères-heures).'},
+    {k:'pairs',q:'Associe électrode de la pile Daniell à son rôle :',pairs:[['Zinc (anode)','Se dissout (oxydation)'],['Cuivre (cathode)','Se dépose (réduction)'],['Borne −','Anode (Zn)'],['Borne +','Cathode (Cu)']],expl:'Dans la pile Daniell, Zn s\'oxyde à l\'anode (−) et Cu²⁺ se réduit à la cathode (+).'}]},
   {id:'ch13',icon:'🌊',color:'#38bdf8',nodeColor:'#38bdf8',title:'Notion d\'Onde',sub:'λ = c/f, ondes mécaniques et électromagnétiques.',level:'🔵 Terminale',steps:[
     {k:'theory',ico:'🌊',title:'Définition et types d\'ondes',sub:'Transfert d\'énergie sans transport de matière',
       html:`<p>Une <strong>onde</strong> = propagation d'une perturbation. Transfert d'énergie <strong>sans transport de matière</strong>.</p>
@@ -1123,7 +1387,18 @@ const CUR = [
     {k:'mcq',q:'Quelle onde peut se propager dans le vide ?',
       opts:['Le son','Les ondes sismiques','La lumière','Les vagues'],ans:2,
       expl:'La <strong>lumière</strong> est une onde EM qui se propage dans le vide. Le son est mécanique → impossible dans le vide.'},
-  ]},
+    {k:'fill',q:'f = 200 Hz. T = ___ s.',ans:'0.005',acc:['0.005','0,005','5e-3','5×10⁻³'],ph:'ex: 0.005',hint:'T = 1/f = 1/200',expl:'T = 1/200 = <code>0,005 s</code> = 5 ms.'},
+    {k:'mcq',q:'Une onde transversale : les oscillations sont :',opts:['Parallèles à la propagation','Perpendiculaires à la propagation','Circulaires','Nulles'],ans:1,expl:'Onde transversale : oscillations <strong>perpendiculaires</strong> à la direction de propagation (ex: vagues).'},
+    {k:'fill',q:'c = 340 m/s, T = 0,002 s. λ = ___ m.',ans:'0.68',acc:['0.68','0,68'],ph:'ex: 0.68',hint:'λ = c × T = 340 × 0,002',expl:'λ = 340 × 0,002 = <code>0,68 m</code>.'},
+    {k:'pairs',q:'Associe onde à son type :',pairs:[['Son','Mécanique longitudinale'],['Lumière','Électromagnétique transversale'],['Vague','Mécanique transversale'],['Séisme (primaire)','Mécanique longitudinale']],expl:'Les ondes mécaniques nécessitent un milieu. Les EM se propagent dans le vide.'},
+    {k:'fill',q:'λ = 0,5 m, c = 340 m/s. f = ___ Hz.',ans:'680',acc:['680'],ph:'ex: 680',hint:'f = c/λ = 340/0,5',expl:'f = 340/0,5 = <code>680 Hz</code>.'},
+    {k:'mcq',q:'La période T et la fréquence f sont liées par :',opts:['T = f','T = 1/f','T = f²','T = 2πf'],ans:1,expl:'<strong>T = 1/f</strong>. Si f = 100 Hz, T = 0,01 s = 10 ms.'},
+    {k:'fill',q:'f = 50 Hz. T = ___ ms.',ans:'20',acc:['20'],ph:'ex: 20',hint:'T = 1/50 = 0,02 s = 20 ms',expl:'T = 1/50 = 0,02 s = <code>20 ms</code>. Fréquence du courant alternatif en Europe.'},
+    {k:'mcq',q:'Quelle onde est longitudinale ?',opts:['Vague','Lumière','Son','Onde de corde'],ans:2,expl:'Le <strong>son</strong> est une onde mécanique <strong>longitudinale</strong> : les oscillations de l\'air sont parallèles à la propagation.'},
+    {k:'fill',q:'T = 0,1 s. f = ___ Hz.',ans:'10',acc:['10'],ph:'ex: 10',hint:'f = 1/T = 1/0,1',expl:'f = 1/0,1 = <code>10 Hz</code>.'},
+    {k:'mcq',q:'La modulation AM (radio) modifie :',opts:['La fréquence porteuse','L\'amplitude de l\'onde porteuse','La vitesse de l\'onde','La longueur d\'onde'],ans:1,expl:'AM = Amplitude Modulation : c\'est l\'<strong>amplitude</strong> de l\'onde porteuse qui est modulée.'},
+    {k:'fill',q:'λ = 3 m, f = 100 Hz. Célérité c = ___ m/s.',ans:'300',acc:['300'],ph:'ex: 300',hint:'c = λ × f = 3 × 100',expl:'c = 3 × 100 = <code>300 m/s</code>.'},
+    {k:'mcq',q:'La longueur d\'onde représente :',opts:['La durée d\'une oscillation','La distance entre deux points en phase','La vitesse de l\'onde','L\'énergie de l\'onde'],ans:1,expl:'λ = <strong>distance entre deux points consécutifs en phase</strong> (ex: deux crêtes successives).'}]},
   {id:'ch14',icon:'🔊',color:'#38bdf8',nodeColor:'#38bdf8',title:'Ondes Sonores',sub:'Célérité du son, fréquence et intensité acoustique.',level:'🔵 Terminale',steps:[
     {k:'theory',ico:'🎵',title:'Célérité et fréquence du son',sub:'Aigu, grave, ultrasons',
       html:`<p>Onde sonore = onde mécanique longitudinale produite par vibration.</p>
@@ -1141,7 +1416,18 @@ const CUR = [
     {k:'mcq',q:'Un son aigu a une fréquence :',
       opts:['Faible','Élevée','Nulle','Identique à un son grave'],ans:1,
       expl:'Son aigu = fréquence <strong>élevée</strong>. Son grave = fréquence faible.'},
-  ]},
+    {k:'fill',q:'c = 340 m/s, f = 850 Hz. λ = ___ m.',ans:'0.4',acc:['0.4','0,4'],ph:'ex: 0.4',hint:'λ = c/f = 340/850',expl:'λ = 340/850 = <code>0,4 m</code>.'},
+    {k:'mcq',q:'Les ultrasons ont une fréquence :',opts:['Inférieure à 20 Hz','Entre 20 Hz et 20 kHz','Supérieure à 20 kHz','Égale à 20 kHz'],ans:2,expl:'Ultrasons : f > <strong>20 000 Hz</strong> = 20 kHz. Utilisés en échographie médicale.'},
+    {k:'fill',q:'I = 10⁻³ W/m². I₀ = 10⁻¹² W/m². L = 10 × log(I/I₀) = ___ dB.',ans:'90',acc:['90'],ph:'ex: 90',hint:'10 × log(10⁻³/10⁻¹²) = 10 × log(10⁹) = 10×9',expl:'L = 10 × 9 = <code>90 dB</code>.'},
+    {k:'mcq',q:'La célérité du son dépend de :',opts:['La fréquence','La source','Le milieu et la température','L\'amplitude'],ans:2,expl:'La célérité du son dépend du <strong>milieu</strong> et de la <strong>température</strong>. Dans l\'air à 0°C : ≈ 331 m/s, à 20°C : ≈ 340 m/s.'},
+    {k:'fill',q:'Son à 340 m/s. Distance source-mur = 85 m. Écho après ___ s.',ans:'0.5',acc:['0.5','0,5'],ph:'ex: 0.5',hint:'t = 2d/c = 2×85/340',expl:'t = 170/340 = <code>0,5 s</code>. (aller-retour donc ×2).'},
+    {k:'mcq',q:'Un son de 120 dB est :',opts:['Inaudible','Au seuil d\'audition','Très fort (concerts)','Douloureux / dangereux'],ans:3,expl:'120 dB ≈ seuil de douleur. Au-delà de <strong>85 dB</strong> prolongé, risque de surdité.'},
+    {k:'fill',q:'f = 20 Hz (infrasono). T = ___ s.',ans:'0.05',acc:['0.05','0,05'],ph:'ex: 0.05',hint:'T = 1/f = 1/20',expl:'T = 1/20 = <code>0,05 s</code> = 50 ms.'},
+    {k:'pairs',q:'Associe fréquence à la catégorie sonore :',pairs:[['5 Hz','Infrason'],['500 Hz','Son audible'],['30 000 Hz','Ultrason'],['340 m/s','Célérité dans l\'air']],expl:'Infra < 20 Hz < audible < 20 kHz < ultra. La célérité est indépendante de la fréquence.'},
+    {k:'mcq',q:'Un son grave a :',opts:['Fréquence élevée, grande λ','Fréquence faible, grande λ','Fréquence faible, petite λ','Amplitude forte'],ans:1,expl:'Son grave = <strong>fréquence faible</strong>. Et λ = c/f → f faible → λ grande.'},
+    {k:'fill',q:'Pa = 0,04 W, S = 0,02 m². I = ___ W/m².',ans:'2',acc:['2','2.0'],ph:'ex: 2',hint:'I = Pa/S = 0,04/0,02',expl:'I = 0,04/0,02 = <code>2 W/m²</code>.'},
+    {k:'mcq',q:'L\'échographie utilise des ultrasons car :',opts:['Ils sont audibles','Ils traversent le corps et réfléchissent','Ils sont visibles','Ils ont une fréquence de 20 Hz'],ans:1,expl:'Les ultrasons <strong>traversent les tissus</strong> et se réfléchissent aux interfaces → imagerie médicale.'},
+    {k:'fill',q:'c_eau = 1500 m/s, f = 3 MHz = 3×10⁶ Hz. λ = ___ m.',ans:'5e-4',acc:['5e-4','0.0005','5×10⁻⁴','0,0005'],ph:'ex: 5e-4',hint:'λ = c/f = 1500/(3×10⁶)',expl:'λ = 1500/3000000 = <code>5×10⁻⁴ m</code> = 0,5 mm.'}]},
   {id:'ch15',icon:'🌈',color:'#c084fc',nodeColor:'#c084fc',title:'Ondes EM',sub:'Spectre EM, lumière et photométrie.',level:'🔵 Terminale',steps:[
     {k:'theory',ico:'💡',title:'Onde électromagnétique et spectre',sub:'c = 3 × 10⁸ m/s',
       html:`<div class="fbox"><div class="fmain">c = 3 × 10⁸ m/s</div><div class="fleg"><div class="fi">vitesse dans le vide</div></div></div>
@@ -1160,7 +1446,75 @@ const CUR = [
     {k:'pairs',q:'Associe chaque onde à une application :',
       pairs:[['Micro-ondes','Four à micro-ondes'],['Rayons X','Radiographie médicale'],['UV','Stérilisation'],['IR','Télécommande']],
       expl:'Chaque gamme du spectre a ses applications selon son énergie et sa capacité de pénétration.'},
-  ]},
+    {k:'fill',q:'c = 3×10⁸ m/s, f = 6×10¹⁴ Hz. λ = ___ m.',ans:'5e-7',acc:['5e-7','5×10⁻⁷','500e-9','500nm'],ph:'ex: 5e-7',hint:'λ = c/f',expl:'λ = 3×10⁸/6×10¹⁴ = <code>5×10⁻⁷ m</code> = 500 nm (vert).'},
+    {k:'mcq',q:'Les rayons X ont une longueur d\'onde :',opts:['Supérieure à l\'infrarouge','Supérieure à l\'UV','Inférieure à l\'UV','Égale à la lumière visible'],ans:2,expl:'Ordre croissant λ : γ < X < UV < visible < IR < micro < radio. Les X ont λ <strong>inférieure à l\'UV</strong>.'},
+    {k:'fill',q:'λ = 10⁻² m (micro-ondes). f = ___ Hz.',ans:'3e10',acc:['3e10','3×10¹⁰','30e9','30 GHz'],ph:'ex: 3e10',hint:'f = c/λ = 3×10⁸/10⁻²',expl:'f = 3×10⁸/10⁻² = <code>3×10¹⁰ Hz</code> = 30 GHz.'},
+    {k:'pairs',q:'Associe onde EM à sa gamme de longueur d\'onde :',pairs:[['Rayons γ','< 10⁻¹² m'],['UV','10⁻⁸ à 4×10⁻⁷ m'],['Visible','4-7 ×10⁻⁷ m'],['Ondes radio','> 10⁻¹ m']],expl:'Le spectre EM s\'étend sur plus de 20 ordres de grandeur en longueur d\'onde.'},
+    {k:'mcq',q:'L\'infrarouge est utilisé pour :',opts:['Radiographie médicale','Stérilisation UV','Télécommandes et thermographie','Communication radio'],ans:2,expl:'L\'<strong>infrarouge</strong> est utilisé dans les télécommandes et la thermographie (caméras thermiques).'},
+    {k:'fill',q:'T couleur = 6500 K → lumière :',ans:'froide',acc:['froide','froide (bleutée)','bleutée'],ph:'ex: froide',hint:'6500 K > 5000 K → froid',expl:'6500 K = lumière <code>froide</code> (bleutée). 2700 K = lumière chaude (orangée).'},
+    {k:'mcq',q:'Les ondes radio FM (88-108 MHz) ont une longueur d\'onde :',opts:['< 1 mm','1 mm à 1 m','3 à 3,4 m','> 100 m'],ans:2,expl:'λ = c/f = 3×10⁸/10⁸ ≈ <strong>3 m</strong>. Les ondes FM ont λ ≈ 2,8 à 3,4 m.'},
+    {k:'fill',q:'Φ = 1200 lm, S = 6 m². Éclairement E = ___ lx.',ans:'200',acc:['200'],ph:'ex: 200',hint:'E = Φ/S = 1200/6',expl:'E = 1200/6 = <code>200 lx</code>. Un bureau confortable : 300-500 lx.'},
+    {k:'mcq',q:'Parmi les rayonnements suivants, lequel est ionisant ?',opts:['Ondes radio','Lumière visible','Infrarouge','Rayons X'],ans:3,expl:'Les <strong>rayons X</strong> (et γ) ont assez d\'énergie pour ioniser les atomes → dangereux à forte dose.'},
+    {k:'fill',q:'λ = 700 nm = ___ m.',ans:'7e-7',acc:['7e-7','7×10⁻⁷','700e-9'],ph:'ex: 7e-7',hint:'nm = 10⁻⁹ m → 700×10⁻⁹',expl:'700 nm = <code>7×10⁻⁷ m</code>. C\'est le rouge dans le spectre visible.'},
+    {k:'mcq',q:'La lumière visible correspond à λ ≈ :',opts:['1 nm à 100 nm','400 nm à 700 nm','1 mm à 10 cm','10 μm à 1 mm'],ans:1,expl:'Le visible : <strong>400 nm</strong> (violet) à <strong>700 nm</strong> (rouge). Hors de cette gamme : invisible à l\'œil.'},
+    {k:'pairs',q:'Associe couleur à sa longueur d\'onde approximative :',pairs:[['Violet','400 nm'],['Vert','550 nm'],['Jaune','580 nm'],['Rouge','700 nm']],expl:'ROYGBIV inversé : violet (court) → rouge (long). La lumière blanche est la somme de toutes ces λ.'}]},
+  {id:'p1',icon:'🧲',color:'#fb923c',nodeColor:'#fb923c',title:'Maxwell',sub:'Les 4 équations qui unifient électricité et magnétisme.',level:'🟠 Prépa/L1',steps:[
+    {k:'theory',ico:'⚡',title:'Équations de Maxwell',sub:'La lumière naît de leurs équations',
+      html:`<p>Maxwell (1831-1879) unifia l'électricité et le magnétisme en 4 équations. Les deux vectorielles :</p>
+      <div class="fbox"><div class="fmain">rot E = −∂B/∂t</div><div class="fleg"><div class="fi">Maxwell-Faraday</div></div></div>
+      <div class="fbox"><div class="fmain">rot B = μ₀(J + ε₀∂E/∂t)</div><div class="fleg"><div class="fi">Maxwell-Ampère</div></div></div>
+      <div class="tip"><div class="tiico">💡</div><div class="titxt">En combinant ses 4 équations, Maxwell prédit les <strong>ondes EM</strong> à c = 3×10⁸ m/s et réalise que <strong>la lumière est une onde électromagnétique</strong> !</div></div>`},
+    {k:'mcq',q:'Que traduit Maxwell-Faraday (rot E = −∂B/∂t) ?',
+      opts:['Les charges créent E','Un B variable génère E','Le courant crée B','Les monopôles existent'],ans:1,
+      expl:'Un champ magnétique variable dans le temps induit un champ électrique. C\'est la base des générateurs électriques !'},
+    {k:'fill',q:'c = 1/√(μ₀ε₀) ≈ ___ × 10⁸ m/s.',ph:'ex: 3',
+      ans:'3',acc:['3','3.0','3,0'],hint:'Vitesse de la lumière dans le vide.',
+      expl:'c ≈ <code>3 × 10⁸</code> m/s. Maxwell l\'a calculé depuis des constantes électriques en 1865 !'},
+    {k:'mcq',q:'La forme intégrale de Maxwell-Faraday est :',
+      opts:['∮E·dl = dΦ/dt','∮E·dl = −dΦ/dt','∮B·dl = −dΦ/dt','∮E·dl = μ₀I'],ans:1,
+      expl:'Le <strong>signe moins</strong> traduit la loi de Lenz : le courant induit s\'oppose à la variation de flux.'},
+    {k:'fill',q:'c = 1/√(μ₀ε₀). μ₀ = 4π×10⁻⁷, ε₀ = 8,85×10⁻¹². c ≈ ___ ×10⁸ m/s.',ans:'3',acc:['3','3.0','3,0'],ph:'ex: 3',hint:'1/√(4π×10⁻⁷ × 8,85×10⁻¹²)',expl:'c ≈ <code>3×10⁸</code> m/s. Maxwell le calcula en 1865 depuis des constantes électromagnétiques !'},
+    {k:'mcq',q:'Maxwell-Gauss (div E = ρ/ε₀) traduit :',opts:['Les aimants sont des dipôles','Les charges créent un champ E','B variable génère E','Le courant crée B'],ans:1,expl:'Maxwell-Gauss : les <strong>charges électriques</strong> sont les sources du champ électrique E.'},
+    {k:'pairs',q:'Associe équation de Maxwell à son nom :',pairs:[['div E = ρ/ε₀','Maxwell-Gauss'],['div B = 0','Maxwell-Thomson'],['rot E = -∂B/∂t','Maxwell-Faraday'],['rot B = μ₀(J+ε₀∂E/∂t)','Maxwell-Ampère']],expl:'Les 4 équations de Maxwell unissent électricité et magnétisme en une théorie cohérente.'},
+    {k:'fill',q:'div B = 0 signifie qu\'il n\'existe pas de ___ magnétiques.',ans:'monopôles',acc:['monopôles','monopoles','monopôle magnétique'],ph:'ex: monopôles',hint:'Pas de \'charge magnétique\' isolée',expl:'div B = 0 → pas de <code>monopôles</code> magnétiques. Les aimants ont toujours deux pôles.'},
+    {k:'mcq',q:'La loi de Faraday (rot E = -∂B/∂t) explique :',opts:['Pourquoi la lumière existe','Le fonctionnement des générateurs électriques','La charge des condensateurs','La résistance des conducteurs'],ans:1,expl:'Un champ B variable induit E → base des <strong>générateurs</strong> (alternateurs) et transformateurs.'},
+    {k:'fill',q:'L\'onde EM se propage à c = 3×10⁸ m/s. En 1 s : ___ km.',ans:'300000',acc:['300000','300 000'],ph:'ex: 300000',hint:'3×10⁸ m = 3×10⁵ km',expl:'c = <code>300 000 km/s</code>. La lumière parcourt 300 000 km en 1 seconde !'},
+    {k:'mcq',q:'Le courant de déplacement ε₀∂E/∂t dans Maxwell-Ampère :',opts:['N\'existe que dans les conducteurs','Permet aux ondes EM de se propager dans le vide','Est toujours nul','Correspond au courant continu'],ans:1,expl:'Le courant de déplacement permet la propagation des ondes EM dans le <strong>vide</strong>.'},
+    {k:'fill',q:'Une onde EM à f = 10⁹ Hz a λ = ___ m.',ans:'0.3',acc:['0.3','0,3'],ph:'ex: 0.3',hint:'λ = c/f = 3×10⁸/10⁹',expl:'λ = 3×10⁸/10⁹ = <code>0,3 m</code> = 30 cm (micro-ondes).'},
+    {k:'mcq',q:'Maxwell unifia :',opts:['Mécanique et thermodynamique','Électricité et magnétisme','Optique et acoustique','Gravitation et électricité'],ans:1,expl:'Maxwell unifia <strong>électricité et magnétisme</strong> en une seule théorie : l\'électromagnétisme.'},
+    {k:'mcq',q:'La forme intégrale de Maxwell-Ampère donne :',opts:['La loi de Biot-Savart','La théorème d\'Ampère généralisé','La loi de Coulomb','La loi de Faraday'],ans:1,expl:'∮B·dl = μ₀(I + ε₀dΦ_E/dt) = <strong>théorème d\'Ampère généralisé</strong> avec courant de déplacement.'},
+    {k:'fill',q:'Longueur d\'onde lumière visible (vert) ≈ 550 nm. f = ___ Hz.',ans:'5.45e14',acc:['5.45e14','5.5e14','5,5×10¹⁴','545e12'],ph:'ex: 5.45e14',hint:'f = c/λ = 3×10⁸/550×10⁻⁹',expl:'f = 3×10⁸/(5,5×10⁻⁷) ≈ <code>5,45×10¹⁴ Hz</code>.'},
+    {k:'mcq',q:'Hertz valida expérimentalement les prédictions de Maxwell en :',opts:['1827','1865','1887','1905'],ans:2,expl:'Heinrich Hertz généra et détecta des ondes radio en <strong>1887</strong>, 22 ans après la théorie de Maxwell.'}]},
+  {id:'m1',icon:'🌌',color:'#c084fc',nodeColor:'#c084fc',title:'Relativité',sub:'E = mc² et les effets relativistes d\'Einstein.',level:'🟣 Master',steps:[
+    {k:'theory',ico:'🚀',title:'Relativité Restreinte',sub:'1905 — la révolution d\'Einstein',
+      html:`<p>Einstein pose deux postulats en 1905 :<br>① Lois physiques identiques dans tout référentiel galiléen.<br>② Vitesse de la lumière c constante pour tout observateur.</p>
+      <div class="fbox"><div class="fmain">E = mc²</div><div class="fleg"><div class="fi"><b>E</b> énergie (J)</div><div class="fi"><b>m</b> masse au repos (kg)</div><div class="fi"><b>c</b> ≈ 3×10⁸ m/s</div></div></div>
+      <div class="tip"><div class="tiico">💥</div><div class="titxt">1 gramme de matière = 9×10¹³ joules. L'énergie d'une bombe atomique ne représente qu'une <strong>infime fraction</strong> de cette énergie !</div></div>
+      <div class="fbox"><div class="fmain">γ = 1 / √(1 − v²/c²)</div><div class="fleg"><div class="fi">Facteur de Lorentz</div><div class="fi">γ ≥ 1 toujours</div></div></div>`},
+    {k:'mcq',q:'Que signifie physiquement E = mc² ?',
+      opts:['Énergie cinétique','Équivalence masse-énergie','Énergie d\'un photon','Énergie potentielle'],ans:1,
+      expl:'E = mc² exprime que la <strong>masse est une forme d\'énergie condensée</strong>.'},
+    {k:'fill',q:'Pour v = 0, le facteur de Lorentz γ = ___ .',ph:'ex: 1',
+      ans:'1',acc:['1','1.0','1,0'],hint:'γ = 1/√(1 − 0)',
+      expl:'γ = 1. À vitesse nulle, pas d\'effets relativistes : on retrouve Newton.'},
+    {k:'mcq',q:'À v = 0,6c, γ vaut :',
+      opts:['1,00','1,25','1,60','2,29'],ans:1,
+      expl:'γ = 1/√(1 − 0,36) = 1/0,8 = <code>1,25</code>. Le temps s\'écoule 1,25× plus lentement !'},
+    {k:'pairs',q:'Associe effet relativiste et description :',
+      pairs:[['Dilatation du temps','Temps ralenti en mouvement'],['Contraction des longueurs','Objet plus court'],['E = mc²','Énergie de masse'],['Vitesse limite','c ≈ 3×10⁸ m/s']],
+      expl:'Tous ces effets ont été vérifiés expérimentalement : GPS, muons cosmiques, accélérateurs de particules !'},
+    {k:'fill',q:'m = 1 kg, c = 3×10⁸ m/s. E = ___ J.',ans:'9e16',acc:['9e16','9×10¹⁶','9.0e16'],ph:'ex: 9e16',hint:'E = mc² = 1 × (3×10⁸)²',expl:'E = 1 × 9×10¹⁶ = <code>9×10¹⁶ J</code>. Énergie colossale !'},
+    {k:'mcq',q:'Le facteur de Lorentz γ est toujours :',opts:['< 1','= 1','≥ 1','Variable entre -1 et 1'],ans:2,expl:'γ = 1/√(1-v²/c²). Comme v < c, le dénominateur < 1 → γ <strong>≥ 1</strong> toujours.'},
+    {k:'fill',q:'v = 0,8c. γ = 1/√(1−0,64) = ___ .',ans:'1.67',acc:['1.67','1,67','5/3'],ph:'ex: 1.67',hint:'√(0,36) = 0,6 → γ = 1/0,6',expl:'γ = 1/0,6 = <code>5/3 ≈ 1,67</code>.'},
+    {k:'mcq',q:'La dilatation du temps signifie :',opts:['Le temps passe plus vite en mouvement','Le temps passe plus lentement en mouvement rapide','Le temps s\'arrête à v=c','Le temps est le même partout'],ans:1,expl:'<strong>Dilatation temporelle</strong> : à grande vitesse, les horloges mobiles retardent. Δt\' = γ × Δt₀.'},
+    {k:'fill',q:'Δt₀ = 1 s (repos), γ = 2. Δt\' = ___ s.',ans:'2',acc:['2','2.0'],ph:'ex: 2',hint:'Δt\' = γ × Δt₀ = 2 × 1',expl:'Δt\' = <code>2 s</code>. L\'horloge en mouvement retarde d\'un facteur 2.'},
+    {k:'mcq',q:'La contraction des longueurs : à v élevée, la longueur mesurée est :',opts:['Plus grande','Identique','Plus petite','Nulle'],ans:2,expl:'L\' = L₀/γ. Comme γ > 1, L\' < L₀ → <strong>l\'objet semble plus court</strong> dans la direction du mouvement.'},
+    {k:'pairs',q:'Associe effet relativiste à sa formule :',pairs:[['Dilatation du temps','Δt = γ·Δt₀'],['Contraction longueurs','L = L₀/γ'],['Énergie masse','E = mc²'],['Facteur de Lorentz','γ = 1/√(1-v²/c²)']],expl:'Ces formules décrivent les effets relativistes, tous vérifiés expérimentalement.'},
+    {k:'fill',q:'E_repos = 511 keV pour l\'électron. En joules ≈ ___ J.',ans:'8.2e-14',acc:['8.2e-14','8.2×10⁻¹⁴'],ph:'ex: 8.2e-14',hint:'1 eV = 1,6×10⁻¹⁹ J → 511×10³×1,6×10⁻¹⁹',expl:'E = 511×10³ × 1,6×10⁻¹⁹ ≈ <code>8,2×10⁻¹⁴ J</code>.'},
+    {k:'mcq',q:'À v → c, l\'énergie cinétique :',opts:['Reste finie','Tend vers l\'infini','Devient nulle','Vaut mc²'],ans:1,expl:'E_c = (γ-1)mc². Quand v→c, γ→∞ → E_c → <strong>infini</strong>. Impossible d\'atteindre c pour une masse non nulle.'},
+    {k:'fill',q:'v = 0,6c, L₀ = 10 m. L\' = L₀/γ = ___ m.',ans:'8',acc:['8','8.0'],ph:'ex: 8',hint:'γ = 1,25 (v=0,6c), L\' = 10/1,25',expl:'L\' = 10/1,25 = <code>8 m</code>. L\'objet semble contracté.'},
+    {k:'mcq',q:'Les muons atmosphériques atteignent le sol grâce à :',opts:['Leur grande vitesse seulement','La dilatation du temps relativiste','La contraction de masse','L\'antigravité'],ans:1,expl:'Les muons ont τ ≈ 2,2 μs. Sans relativité, ils ne devraient pas atteindre le sol. La <strong>dilatation du temps</strong> γ × τ explique ce phénomène.'},
+    {k:'mcq',q:'Le GPS doit corriger les effets relativistes car :',opts:['Les satellites vont trop vite','Relativité restreinte (vitesse) et générale (gravité) modifient le temps','Le signal GPS est trop lent','L\'atmosphère dévie les ondes'],ans:1,expl:'Sans correction : erreur de ~10 km/jour ! Les deux relativités (<strong>restreinte + générale</strong>) doivent être corrigées.'}]},
 ];
 
 /* ==========================================================
@@ -1494,7 +1848,7 @@ function openQuickPicker(){
   grid.innerHTML=CUR.map((L,i)=>{
     const locked=i>=unlocked;
     const qsteps=L.steps.filter(s=>s.k!=='theory').length;
-    const lvlColors={'🟢 Collège':'#39d353','🔵 Lycée':'#38bdf8','🟠 Prépa/L1':'#fb923c','🟣 Master':'#c084fc'};
+    const lvlColors={'🟢 Collège':'#39d353','🟢 1re':'#39d353','🔵 Lycée':'#38bdf8','🔵 Terminale':'#38bdf8','🟠 Prépa/L1':'#fb923c','🟣 Master':'#c084fc'};
     const c=lvlColors[L.level]||'#39d353';
     return `<button class="qp-card ${locked?'locked-card':''}" onclick="${locked?'':'startQuickLesson('+i+')'}">
       <span class="qp-icon">${L.icon}</span>
@@ -1690,12 +2044,10 @@ function rPairs(el,s){
   const left=shuffle(s.pairs.map(p=>p[0]));
   const right=shuffle(s.pairs.map(p=>p[1]));
   G.ps={pairs:s.pairs,sel:null,matched:[]};
+  const rows=left.map((v,i)=>`<button class="pbtn" data-side="L" data-val="${v}">${v}</button><button class="pbtn" data-side="R" data-val="${right[i]}">${right[i]}</button>`).join('');
   el.innerHTML=`<div class="qbadge">Associer les paires</div>
     <div class="qtxt">${s.q}</div>
-    <div class="pgrid" id="pgrid">
-      ${left.map(v=>`<button class="pbtn" data-side="L" data-val="${v}">${v}</button>`).join('')}
-      ${right.map(v=>`<button class="pbtn" data-side="R" data-val="${v}">${v}</button>`).join('')}
-    </div>
+    <div class="pgrid" id="pgrid">${rows}</div>
     <div class="fb" id="fb"></div>`;
   el.querySelectorAll('.pbtn').forEach(b=>b.addEventListener('click',()=>{sndClick();clickPair(b,s);}));
 }
