@@ -484,7 +484,7 @@ body::before{
 }
 
 /* RESULT */
-#s-result{overflow-y:auto;align-items:center;padding:30px 18px 50px;}
+#s-result{overflow-y:auto;align-items:center;padding:30px 18px calc(50px + env(safe-area-inset-bottom));}
 .res-glow{
   width:120px;height:120px;border-radius:50%;margin:0 auto 4px;
   display:flex;align-items:center;justify-content:center;
@@ -659,7 +659,7 @@ body::before{
 }
 .qp-card:hover::after{opacity:1;}
 .qp-card:active{transform:scale(.98);}
-.qp-card.locked-card{opacity:.4;cursor:not-allowed;}
+.qp-card.locked-card{opacity:.4;cursor:not-allowed;pointer-events:none;}
 .qp-icon{font-size:1.7rem;flex-shrink:0;}
 .qp-info{flex:1;}
 .qp-name{font-family:'Syne',sans-serif;font-size:.88rem;font-weight:800;margin-bottom:2px;}
@@ -1749,11 +1749,11 @@ const QUICK_DURATION = 120; // 2 minutes in seconds
 let G = {
   xp:0,streak:0,lives:5,level:1,li:0,si:0,answered:false,
   correct:0,wrong:0,cur:null,ps:null,ws:null,cstate:'idle',
-  soundOn:true,completed:[],
+  soundOn:true,completed:[],xpAtStart:0,
   // daily streak
   dailyStreak:0,lastPlayDate:'',todayDone:false,
   // quick mode
-  isQuick:false,quickSteps:[],quickTimeLeft:QUICK_DURATION,quickTimer:null,quickDone:false,
+  isQuick:false,quickSteps:[],quickTimeLeft:QUICK_DURATION,quickTimer:null,
   // global accuracy tracking
   totalCorrect:0,totalAnswers:0,
   // filter
@@ -1827,7 +1827,7 @@ function goScreen(id){
     if(el)el.classList.toggle('on',id==='s-'+k);
   });
 }
-function goHome(){stopQuickTimer();buildPath();syncNav();syncDailyStreak();setFilter(G.activeFilter,true);goScreen('s-home');}
+function goHome(){closeCards();stopQuickTimer();buildPath();syncNav();syncDailyStreak();setFilter(G.activeFilter,true);goScreen('s-home');}
 function syncNav(){
   const str=document.getElementById('h-str'),xpEl=document.getElementById('h-xp'),lvEl=document.getElementById('h-lv');
   if(str){animVal(str,G.streak);}
@@ -1852,14 +1852,13 @@ function syncNav(){
 /* ==========================================================
    FILTER
 ========================================================== */
-G.activeFilter = null;
 
 function setFilter(level, silent){
   G.activeFilter = level;
   // update chips UI
-  const chipMap = {null:'fc-all','Collège':'fc-college','1re':'fc-1re','Lycée':'fc-lycee','Terminale':'fc-terminale','Prépa':'fc-prepa','Master':'fc-master'};
+  const chipMap = {'':'fc-all','Collège':'fc-college','1re':'fc-1re','Lycée':'fc-lycee','Terminale':'fc-terminale','Prépa':'fc-prepa','Master':'fc-master'};
   document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('on'));
-  const id = chipMap[level];
+  const id = chipMap[level||''];
   if(id){const el=document.getElementById(id);if(el)el.classList.add('on');}
   // dim non-matching nodes
   document.querySelectorAll('.nwrap').forEach((nw,i)=>{
@@ -2378,7 +2377,7 @@ function openQuickPicker(){
     const qsteps=L.steps.filter(s=>s.k!=='theory').length;
     const lvlColors={'🟢 Collège':'#39d353','🟢 1re':'#39d353','🔵 Lycée':'#38bdf8','🔵 Terminale':'#38bdf8','🟠 Prépa/L1':'#fb923c','🟣 Master':'#c084fc'};
     const c=lvlColors[L.level]||'#39d353';
-    return `<button class="qp-card ${locked?'locked-card':''}" onclick="${locked?'':'startQuickLesson('+i+')'}">
+    return `<button class="qp-card ${locked?'locked-card':''}" ${locked?'disabled':'onclick="startQuickLesson('+i+')"'}>
       <span class="qp-icon">${L.icon}</span>
       <div class="qp-info">
         <div class="qp-name">${L.title}</div>
@@ -2395,8 +2394,8 @@ function startQuickLesson(lessonIdx){
   sndClick();
   G.li=lessonIdx;
   G.isQuick=true;
-  G.quickDone=false;
   G.quickTimeLeft=QUICK_DURATION;
+  G.xpAtStart=G.xp;
   // pick random quiz steps (no theory), max 4
   const allQ=CUR[lessonIdx].steps.map((s,i)=>({...s,_orig:i})).filter(s=>s.k!=='theory');
   if(allQ.length===0){showToast('❌ Aucune question dans cette leçon');return;}
@@ -2463,9 +2462,9 @@ function openIntro(idx){
 ========================================================== */
 function startLesson(){
   G.si=0;G.correct=0;G.wrong=0;G.answered=false;G.lives=5;
-  G.isQuick=false;
+  G.isQuick=false;G.xpAtStart=G.xp;
   // restore normal progress bar
-  document.getElementById('pbar-normal').style.display='flex';
+  document.getElementById('pbar-normal').style.display='';
   document.getElementById('tbar-quick').style.display='none';
   document.getElementById('timer-wrap').style.display='none';
   syncNav();goScreen('s-lesson');renderStep();
@@ -2479,7 +2478,7 @@ function confirmQuit(){
   document.getElementById('quit-modal').classList.remove('open');
   G.lives=5;G.isQuick=false;
   // restore UI
-  document.getElementById('pbar-normal').style.display='flex';
+  document.getElementById('pbar-normal').style.display='';
   document.getElementById('tbar-quick').style.display='none';
   document.getElementById('timer-wrap').style.display='none';
   syncNav();goHome();
@@ -2489,6 +2488,7 @@ function cancelQuit(){document.getElementById('quit-modal').classList.remove('op
 function renderStep(){
   const steps=G.isQuick?G.quickSteps:CUR[G.li].steps;
   const step=steps[G.si];
+  if(!step){showResult();return;}
   const total=steps.length;
 
   if(!G.isQuick){
@@ -2535,7 +2535,7 @@ function rMCQ(el,s){
   const letters=['A','B','C','D'];
   el.innerHTML=`<div class="qbadge">Choix multiple</div>
     <div class="qtxt">${s.q}</div>
-    ${s.hint?`<button class="hint-btn" id="hint-btn" onclick="toggleHint(this,'${s.hint.replace(/'/g,"\\'")}')">💡 Afficher l'indice</button><div id="hint-box" class="qhint" style="display:none">${s.hint}</div>`:''}
+    ${s.hint?`<button class="hint-btn" id="hint-btn" data-hint="${s.hint.replace(/"/g,'&quot;')}" onclick="toggleHint(this)">💡 Afficher l'indice</button><div id="hint-box" class="qhint" style="display:none">${s.hint}</div>`:''}
     <div class="kbhints">${letters.slice(0,s.opts.length).map((l,i)=>`<span class="kbh">${l}</span>`).join('')}</div>
     <div class="opts" id="opts">${s.opts.map((o,i)=>`<button class="opt" data-i="${i}"><div class="oltr">${letters[i]}</div><span>${o}</span></button>`).join('')}</div>
     <div class="fb" id="fb"></div>`;
@@ -2558,7 +2558,7 @@ function rFill(el,s){
   setCTA('idle','Vérifier');
   el.innerHTML=`<div class="qbadge">Compléter</div>
     <div class="qtxt">${s.q}</div>
-    ${s.hint?`<button class="hint-btn" id="hint-btn" onclick="toggleHint(this,'${s.hint.replace(/'/g,"\\'")}')">💡 Afficher l'indice</button><div id="hint-box" class="qhint" style="display:none">${s.hint}</div>`:''}
+    ${s.hint?`<button class="hint-btn" id="hint-btn" data-hint="${s.hint.replace(/"/g,'&quot;')}" onclick="toggleHint(this)">💡 Afficher l'indice</button><div id="hint-box" class="qhint" style="display:none">${s.hint}</div>`:''}
     <input class="finp" id="finp" placeholder="${s.ph||'Ta réponse'}" autocomplete="off" autocorrect="off" spellcheck="false">
     <div class="fb" id="fb"></div>`;
   const inp=el.querySelector('#finp');
@@ -2639,10 +2639,11 @@ function refreshWord(el,s){
 }
 
 /* -- Hint -- */
-function toggleHint(btn,hint){
+function toggleHint(btn){
   const box=document.getElementById('hint-box');
   if(box){
     const hidden=box.style.display==='none';
+    if(hidden && box.textContent==='' && btn.dataset.hint) box.textContent=btn.dataset.hint;
     box.style.display=hidden?'flex':'none';
     btn.textContent=hidden?'💡 Masquer l\'indice':'💡 Afficher l\'indice';
   }
@@ -2709,8 +2710,8 @@ function checkAns(){
       else if(i===G.cur&&!ok)b.classList.add('bad');
     });
   } else if(step.k==='fill'){
-    const raw=(G.cur||'').toLowerCase().replace(/\s/g,'').replace(',','.');
-    const acc=step.acc.map(a=>a.toLowerCase().replace(/\s/g,'').replace(',','.'));
+    const raw=(G.cur||'').toLowerCase().replace(/\s/g,'').replace(/,/g,'.');
+    const acc=step.acc.map(a=>a.toLowerCase().replace(/\s/g,'').replace(/,/g,'.'));
     ok=acc.includes(raw);
     const inp=document.getElementById('finp');
     if(inp){inp.disabled=true;inp.classList.add(ok?'ok':'bad');if(!ok)inp.value=step.ans;}
@@ -2752,7 +2753,7 @@ function showResult(timedOut=false){
   stopQuickTimer();
 
   // Restore lesson header UI
-  document.getElementById('pbar-normal').style.display='flex';
+  document.getElementById('pbar-normal').style.display='';
   document.getElementById('tbar-quick').style.display='none';
   document.getElementById('timer-wrap').style.display='none';
 
@@ -2785,7 +2786,7 @@ function showResult(timedOut=false){
   }
 
   document.getElementById('r-cor').textContent=G.correct+'/'+total;
-  document.getElementById('r-xp').textContent='+'+G.xp;
+  document.getElementById('r-xp').textContent='+'+(G.xp-G.xpAtStart);
   document.getElementById('r-acc').textContent=acc+'%';
 
   let owl,title,sub;
